@@ -1,7 +1,7 @@
 const reducer = (state, action) => {
   switch (action.type) {
     case "ADD_ITEM": {
-      const newItem = action.payload;
+      let newItem = action.payload;
       return {
         ...state,
         data: [...state.data, newItem],
@@ -9,26 +9,31 @@ const reducer = (state, action) => {
       };
     }
     case "REMOVE_ITEM": {
-      const key = action.payload;
+      let key = action.payload;
 
-      const dataCopy = [...state.data];
+      let dataCopy = [...state.data];
 
-      const newItems = dataCopy.filter((item) => item.key !== key);
+      let newItems = dataCopy.filter((item) => item.key !== key);
       return {
         ...state,
         data: newItems,
       };
     }
-    case "CALCULATE_TOTAL": {
-      const record = action.payload;
+    case "UPDATE_INPUT_VALUE": {
+      let index = action.payload.index;
+      let newVal = action.payload.val;
+      let column = action.payload.column;
 
-      const dataCopy = [...state.data];
+      let dataCopy = [...state.data];
 
-      const item = { ...dataCopy[record.key - 1] };
+      let item = { ...dataCopy[index] };
 
-      item.total = item.qty * item.price;
+      item[column] = newVal;
 
-      dataCopy[record.key - 1] = item;
+      if  (column === "qty" || column === "price")
+        item.total = item.qty * item.price;
+
+      dataCopy[index] = item;
 
       return {
         ...state,

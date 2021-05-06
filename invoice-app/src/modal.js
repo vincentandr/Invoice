@@ -1,6 +1,48 @@
 import { Modal, Table, Button, Input, InputNumber } from "antd";
+import numberWithCommas from "./util.js";
 
 const ModalBarang = (props) => {
+  const EditableCell = ({
+    editable,
+    record,
+    children,
+    dataIndex,
+    rowIndex,
+    ...restProps
+  }) => {
+    let childNode = children;
+
+    if (editable) {
+      childNode = (
+        <Input
+          defaultValue={
+            dataIndex === "price"
+              ? numberWithCommas(props.state.data[rowIndex][dataIndex])
+              : props.state.data[rowIndex][dataIndex]
+          }
+          onBlur={(e) =>
+            props.dispatch({
+              type: "UPDATE_INPUT_VALUE",
+              payload: {
+                val: e.target.value,
+                index: rowIndex,
+                column: dataIndex,
+              },
+            })
+          }
+        />
+      );
+    }
+
+    return <td {...restProps}>{childNode}</td>;
+  };
+
+  const components = {
+    body: {
+      cell: EditableCell,
+    },
+  };
+
   const columns = [
     {
       title: "No.",
@@ -12,57 +54,31 @@ const ModalBarang = (props) => {
       dataIndex: "code",
       width: "15%",
       editable: true,
-      render: (_, record, index) => {
-        return <Input value={props.state.data[index].code}/>;
-      },
     },
     {
       title: "Nama Barang",
       dataIndex: "name",
-      width: "40%",
+      width: "30%",
       editable: true,
-      render: (_, record, index) => {
-        return (
-          <Input
-            value={props.state.data[index].name}
-          />
-        );
-      },
     },
     {
       title: "Qty",
       dataIndex: "qty",
       width: "8%",
       editable: true,
-      render: (text, record, index) => {
-        return (
-          <InputNumber
-            value={props.state.data[index].qty}
-            onChange={() =>
-              calculateTotalPerItem(record, props.state.data[index].qty)
-            }
-          />
-        );
-      },
     },
     {
-      title: "Harga",
+      title: "Harga (Rp.)",
       dataIndex: "price",
+      width: "13%",
       editable: true,
-      render: (text, record, index) => {
-        return (
-          <InputNumber
-            value={props.state.data[index].price}
-            onChange={() =>
-              calculateTotalPerItem(record, props.state.data[index].price)
-            }
-          />
-        );
-      },
     },
     {
-      title: "Total",
+      title: "Total (Rp.)",
       dataIndex: "total",
+      width: "14%",
+      render: (text, _, index) => 
+      (numberWithCommas(props.state.data[index].total))
     },
     {
       title: "Hapus",
@@ -80,6 +96,23 @@ const ModalBarang = (props) => {
     },
   ];
 
+  const tableColumns = columns.map((col) => {
+    if (!col.editable) {
+      return col;
+    }
+
+    return {
+      ...col,
+      onCell: (record, rowIndex) => ({
+        record,
+        rowIndex,
+        editable: col.editable,
+        dataIndex: col.dataIndex,
+        title: col.title,
+      }),
+    };
+  });
+
   const addItem = () => {
     const newRow = {
       key: props.state.count + 1,
@@ -91,18 +124,11 @@ const ModalBarang = (props) => {
       total: 0,
     };
 
-    props.dispatch({    type:    "ADD_ITEM", payload:    newRow    });
+    props.dispatch({ type: "ADD_ITEM", payload: newRow });
   };
 
   const removeItem = (key) => {
-    props.dispatch({    type:    "REMOVE_ITEM", payload:    key    });
-  };
-
-  const calculateTotalPerItem = (record, val) => {
-    console.log(record);
-    console.log(val);
-
-    props.dispatch({     type:     "CALCULATE_TOTAL", payload:     record     });
+    props.dispatch({ type: "REMOVE_ITEM", payload: key });
   };
 
   return (
@@ -115,8 +141,9 @@ const ModalBarang = (props) => {
       width="75rem"
     >
       <Table
+        components={components}
         dataSource={props.state.data}
-        columns={columns}
+        columns={tableColumns}
         pagination={{ pageSize: 5 }}
       />
       <Button type="primary" htmlType="button" onClick={addItem}>
