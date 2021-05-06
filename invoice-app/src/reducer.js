@@ -19,6 +19,23 @@ const reducer = (state, action) => {
         data: newItems,
       };
     }
+    case "REMOVE_ALL": {
+      return {
+        ...state,
+        data: [
+          {
+            key: 1,
+            code: "",
+            name: "",
+            desc: "",
+            qty: 0,
+            price: 0,
+            total: 0,
+          },
+        ],
+        count: 1,
+      };
+    }
     case "UPDATE_INPUT_VALUE": {
       let index = action.payload.index;
       let newVal = action.payload.val;
@@ -30,7 +47,7 @@ const reducer = (state, action) => {
 
       item[column] = newVal;
 
-      if  (column === "qty" || column === "price")
+      if (column === "qty" || column === "price")
         item.total = item.qty * item.price;
 
       dataCopy[index] = item;

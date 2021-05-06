@@ -1,4 +1,4 @@
-import { Modal, Table, Button, Input, InputNumber } from "antd";
+import { Modal, Table, Button, Input, Row, Col, Popconfirm } from "antd";
 import numberWithCommas from "./util.js";
 
 const ModalBarang = (props) => {
@@ -77,8 +77,8 @@ const ModalBarang = (props) => {
       title: "Total (Rp.)",
       dataIndex: "total",
       width: "14%",
-      render: (text, _, index) => 
-      (numberWithCommas(props.state.data[index].total))
+      render: (text, _, index) =>
+        numberWithCommas(props.state.data[index].total),
     },
     {
       title: "Hapus",
@@ -131,6 +131,10 @@ const ModalBarang = (props) => {
     props.dispatch({ type: "REMOVE_ITEM", payload: key });
   };
 
+  const removeAll = () => {
+    props.dispatch({ type: "REMOVE_ALL" });
+  };;
+
   return (
     <Modal
       title="Daftar Barang"
@@ -146,9 +150,34 @@ const ModalBarang = (props) => {
         columns={tableColumns}
         pagination={{ pageSize: 5 }}
       />
-      <Button type="primary" htmlType="button" onClick={addItem}>
-        Tambah Barang
-      </Button>
+      <Row justify="center">
+        <Col span="4">
+          <Button
+            type="primary"
+            size="large"
+            htmlType="button"
+            onClick={addItem}
+          >
+            Tambah Barang Baru
+          </Button>
+        </Col>
+        <Col span="4">
+          <Popconfirm
+            title="Yakin ingin hapus semua barang?"
+            onConfirm={removeAll}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button
+              type="primary"
+              size="large"
+              htmlType="button"
+            >
+              Hapus Semua Barang
+            </Button>
+          </Popconfirm>
+        </Col>
+      </Row>
     </Modal>
   );
 };
