@@ -1,26 +1,6 @@
 import { Modal, Table, Button, Input, InputNumber } from "antd";
-import { useState } from "react";
 
 const ModalBarang = (props) => {
-  const dataSource = [
-    {
-      key: 1,
-      code: "A123",
-      name: "Barang 1",
-      qty: 30,
-      price: 10000,
-      total: 30 * 10000,
-    },
-    {
-      key: 2,
-      code: "B123",
-      name: "Barang 2",
-      qty: 10,
-      price: 20000,
-      total: 10 * 20000,
-    },
-  ];
-
   const columns = [
     {
       title: "No.",
@@ -31,28 +11,35 @@ const ModalBarang = (props) => {
       title: "Kode Barang",
       dataIndex: "code",
       width: "15%",
-      render: (text, _) => {
-        return <Input defaultValue={text} />;
+      editable: true,
+      render: (_, record, index) => {
+        return <Input value={props.state.data[index].code}/>;
       },
     },
     {
       title: "Nama Barang",
       dataIndex: "name",
       width: "40%",
-      render: (text, _) => {
-        return <Input defaultValue={text} />;
+      editable: true,
+      render: (_, record, index) => {
+        return (
+          <Input
+            value={props.state.data[index].name}
+          />
+        );
       },
     },
     {
       title: "Qty",
       dataIndex: "qty",
       width: "8%",
+      editable: true,
       render: (text, record, index) => {
         return (
           <InputNumber
-            value={data[index].qty}
+            value={props.state.data[index].qty}
             onChange={() =>
-              calculateTotalPerItem(text, record, data[index].qty)
+              calculateTotalPerItem(record, props.state.data[index].qty)
             }
           />
         );
@@ -61,12 +48,13 @@ const ModalBarang = (props) => {
     {
       title: "Harga",
       dataIndex: "price",
+      editable: true,
       render: (text, record, index) => {
         return (
           <InputNumber
-            value={data[index].price}
+            value={props.state.data[index].price}
             onChange={() =>
-              calculateTotalPerItem(text, record, data[index].price)
+              calculateTotalPerItem(record, props.state.data[index].price)
             }
           />
         );
@@ -80,7 +68,7 @@ const ModalBarang = (props) => {
       title: "Hapus",
       dataIndex: "remove",
       render: (_, record) =>
-        data.length > 1 ? (
+        props.state.data.length > 1 ? (
           <Button
             type="default"
             danger="true"
@@ -92,12 +80,9 @@ const ModalBarang = (props) => {
     },
   ];
 
-  const [data, setData] = useState(dataSource);
-  const [count, setCount] = useState(2);
-
   const addItem = () => {
     const newRow = {
-      key: count + 1,
+      key: props.state.count + 1,
       code: "",
       name: "",
       desc: "",
@@ -106,33 +91,18 @@ const ModalBarang = (props) => {
       total: 0,
     };
 
-    const newData = [...data, newRow];
-
-    setData(newData);
-    setCount((prevState) => prevState + 1);
+    props.dispatch({    type:    "ADD_ITEM", payload:    newRow    });
   };
 
   const removeItem = (key) => {
-    const newItems = data.filter((item) => item.key !== key);
-
-    setData(newItems);
+    props.dispatch({    type:    "REMOVE_ITEM", payload:    key    });
   };
 
-  const calculateTotalPerItem = (text, record, val) => {
+  const calculateTotalPerItem = (record, val) => {
     console.log(record);
-    console.log(text);
-
     console.log(val);
 
-    const items = [...data];
-
-    const item = { ...items[record.key - 1] };
-
-    item.total = item.qty * item.price;
-
-    items[record.key - 1] = item;
-
-    setData(items);
+    props.dispatch({     type:     "CALCULATE_TOTAL", payload:     record     });
   };
 
   return (
@@ -144,7 +114,11 @@ const ModalBarang = (props) => {
       maskClosable={false}
       width="75rem"
     >
-      <Table dataSource={data} columns={columns} pagination={{ pageSize: 5 }} />
+      <Table
+        dataSource={props.state.data}
+        columns={columns}
+        pagination={{ pageSize: 5 }}
+      />
       <Button type="primary" htmlType="button" onClick={addItem}>
         Tambah Barang
       </Button>

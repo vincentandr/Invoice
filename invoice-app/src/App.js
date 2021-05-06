@@ -1,7 +1,8 @@
 import "./App.css";
-import { useState } from "react";
+import { useReducer } from "react";
 import { Button, Form, Input, DatePicker, Row } from "antd";
 import ModalBarang from "./modal.js";
+import reducer from "./reducer.js";
 
 const App = () => {
   const layout = {
@@ -19,16 +20,32 @@ const App = () => {
     },
   };
 
-  const [isShowModal, setShowModal] = useState(false);
+  const defaultState = {
+    data: [
+      {
+        key: 1,
+        code: "",
+        name: "",
+        desc: "",
+        qty: 0,
+        price: 0,
+        total: 0,
+      },
+    ],
+    count: 1,
+    isShowModal: false,
+  };
+
+  const [state, dispatch] = useReducer(reducer, defaultState);
 
   const handleOk = () => {
     // save
-    setShowModal(false);
+    dispatch({ type: "TOGGLE_MODAL" });
   };
 
   const handleCancel = () => {
     // cancel
-    setShowModal(false);
+    dispatch({ type: "TOGGLE_MODAL" });
   };
 
   return (
@@ -59,20 +76,19 @@ const App = () => {
           <Button
             type="primary"
             htmlType="button"
-            onClick={() => {
-              console.log(isShowModal);
-              return setShowModal((prevState) => !prevState);
-            }}
+            onClick={() => dispatch({ type: "TOGGLE_MODAL" })}
           >
             Edit Barang
           </Button>
         </Form.Item>
         <Form.Item>
-          {isShowModal && (
+          {state.isShowModal && (
             <ModalBarang
-              visible={isShowModal}
+              visible={state.isShowModal}
               onOk={handleOk}
               onCancel={handleCancel}
+              dispatch={dispatch}
+              state={state}
             />
           )}
         </Form.Item>
