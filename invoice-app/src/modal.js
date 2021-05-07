@@ -1,4 +1,5 @@
 import { Modal, Table, Button, Input, Row, Col, Popconfirm } from "antd";
+import { useState } from "react";
 import numberWithCommas from "./util.js";
 
 const ModalBarang = (props) => {
@@ -13,19 +14,21 @@ const ModalBarang = (props) => {
     let childNode = children;
 
     if (editable) {
+      let page = { ...props.state.pagination };
+      let index = rowIndex + (page.current - 1) * page.pageSize;
       childNode = (
         <Input
           defaultValue={
             dataIndex === "price"
-              ? numberWithCommas(props.state.data[rowIndex][dataIndex])
-              : props.state.data[rowIndex][dataIndex]
+              ? numberWithCommas(props.state.data[index][dataIndex])
+              : props.state.data[index][dataIndex]
           }
           onBlur={(e) =>
             props.dispatch({
               type: "UPDATE_INPUT_VALUE",
               payload: {
                 val: e.target.value,
-                index: rowIndex,
+                index: index,
                 column: dataIndex,
               },
             })
@@ -77,8 +80,13 @@ const ModalBarang = (props) => {
       title: "Total (Rp.)",
       dataIndex: "total",
       width: "14%",
-      render: (text, _, index) =>
-        numberWithCommas(props.state.data[index].total),
+      render: (text, _, index) => {
+        let idx =
+          index +
+          (props.state.pagination.current - 1) *
+            props.state.pagination.pageSize;
+        return numberWithCommas(props.state.data[idx].total);
+      },
     },
     {
       title: "Hapus",
@@ -133,7 +141,11 @@ const ModalBarang = (props) => {
 
   const removeAll = () => {
     props.dispatch({ type: "REMOVE_ALL" });
-  };;
+  };
+
+  const changePage = (page) => {
+    props.dispatch({ type: "CHANGE_PAGE", payload: page.current });
+  };
 
   return (
     <Modal
@@ -148,7 +160,8 @@ const ModalBarang = (props) => {
         components={components}
         dataSource={props.state.data}
         columns={tableColumns}
-        pagination={{ pageSize: 5 }}
+        pagination={props.state.pagination}
+        onChange={(pagination) => changePage(pagination)}
       />
       <Row justify="center">
         <Col span="4">
@@ -168,11 +181,7 @@ const ModalBarang = (props) => {
             okText="Yes"
             cancelText="No"
           >
-            <Button
-              type="primary"
-              size="large"
-              htmlType="button"
-            >
+            <Button type="primary" size="large" htmlType="button">
               Hapus Semua Barang
             </Button>
           </Popconfirm>

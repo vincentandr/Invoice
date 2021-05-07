@@ -2,10 +2,18 @@ const reducer = (state, action) => {
   switch (action.type) {
     case "ADD_ITEM": {
       let newItem = action.payload;
+
+      let newCount = state.count + 1;
+
+      let pageSize = state.pagination.pageSize;
+
+      let current = Math.ceil(newCount / pageSize);
+
       return {
         ...state,
         data: [...state.data, newItem],
-        count: state.count + 1,
+        count: newCount,
+        pagination: { ...state.pagination, current: current },
       };
     }
     case "REMOVE_ITEM": {
@@ -34,6 +42,10 @@ const reducer = (state, action) => {
           },
         ],
         count: 1,
+        pagination: {
+          ...state.pagination,
+          current: 1,
+        },
       };
     }
     case "UPDATE_INPUT_VALUE": {
@@ -52,6 +64,8 @@ const reducer = (state, action) => {
 
       dataCopy[index] = item;
 
+      console.log(dataCopy);
+
       return {
         ...state,
         data: [...dataCopy],
@@ -61,6 +75,12 @@ const reducer = (state, action) => {
       return {
         ...state,
         isShowModal: !state.isShowModal,
+      };
+    case "CHANGE_PAGE":
+      const newCurrentPage = action.payload;
+      return {
+        ...state,
+        pagination: { ...state.pagination, current: newCurrentPage },
       };
     default:
       throw new Error("No matching case found");

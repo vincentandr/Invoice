@@ -32,6 +32,10 @@ const App = () => {
         total: 0,
       },
     ],
+    pagination: {
+      current: 1,
+      pageSize: 5,
+    },
     count: 1,
     isShowModal: false,
   };
