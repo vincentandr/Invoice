@@ -1,4 +1,4 @@
-import { useReducer } from "react";
+import { useState, useEffect, useReducer } from "react";
 import {
   Button,
   Form,
@@ -77,6 +77,13 @@ const InvoiceForm = () => {
         console.log(values);
       })
       .catch((err) => console.log(err));
+  };
+
+  const isButtonDisabled = () => {
+    return (
+      Math.ceil(state.data.length / state.pagination.pageSize) !==
+      state.pagination.current
+    );
   };
 
   return (
@@ -198,10 +205,20 @@ const InvoiceForm = () => {
                 </Col>
               </Row>
               <Space direction="vertical" size="middle">
-                <ItemsTable dispatch={dispatch} state={state} form={form} />
+                <ItemsTable
+                  dispatch={dispatch}
+                  state={state}
+                  form={form}
+                  isButtonDisabled={isButtonDisabled()}
+                />
                 <Row justify="center">
                   <Form.Item>
-                    <Button type="primary" size="large" htmlType="submit">
+                    <Button
+                      type="primary"
+                      size="large"
+                      htmlType="submit"
+                      disabled={isButtonDisabled()}
+                    >
                       Generate
                     </Button>
                   </Form.Item>
@@ -240,11 +257,7 @@ const ItemsTable = (props) => {
                 message: `${dataIndex} tidak boleh kosong`,
               },
             ]}
-            initialValue={
-              dataIndex === "harga"
-                ? numberWithCommas(props.state.data[index][dataIndex])
-                : props.state.data[index][dataIndex]
-            }
+            initialValue={props.state.data[index][dataIndex]}
           >
             <InputNumber
               min={dataIndex === "harga" ? 0 : 1}
@@ -394,12 +407,34 @@ const ItemsTable = (props) => {
   };
 
   const removeAll = () => {
-    props.dispatch({ type: "REMOVE_ALL" });
+    props.dispatch({ type: "REMOVE_ALL", payload: props.form });
+
+    setIsRemoveAll(!isRemoveAll);
   };
 
   const changePage = (page) => {
-    props.dispatch({ type: "CHANGE_PAGE", payload: page.current });
+    props.form
+      .validateFields()
+      .then((values) => {
+            props.dispatch({ type: "CHANGE_PAGE", payload: page.current });
+      })
+      .catch((err) => {
+        console.log("error");
+
+      });
   };
+
+  const [isRemoveAll, setIsRemoveAll] = useState(false);
+
+  useEffect(() => {
+    let keys = Object.keys(props.form.getFieldsValue());
+
+    let regex = new RegExp("^kode|^qty|^nama|^harga");
+
+    let toBeReset = keys.filter((key) => regex.test(key));
+
+    props.form.resetFields(toBeReset);
+  }, [isRemoveAll])
 
   return (
     <>
@@ -410,6 +445,12 @@ const ItemsTable = (props) => {
               type="default"
               size="large"
               htmlType="button"
+              disabled={
+                // only active if last page
+                Math.ceil(
+                  props.state.data.length / props.state.pagination.pageSize
+                ) !== props.state.pagination.current
+              }
               onClick={addItem}
             >
               Tambah Barang Baru
@@ -421,8 +462,15 @@ const ItemsTable = (props) => {
               onConfirm={removeAll}
               okText="Yes"
               cancelText="No"
+              disabled={props.isButtonDisabled}
             >
-              <Button type="default" size="large" htmlType="button" danger>
+              <Button
+                type="default"
+                size="large"
+                htmlType="button"
+                disabled={props.isButtonDisabled}
+                danger
+              >
                 Hapus Semua Barang
               </Button>
             </Popconfirm>
