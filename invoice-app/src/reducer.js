@@ -5,9 +5,11 @@ const reducer = (state, action) => {
 
       let newCount = state.count + 1;
 
+      let dataLength = [...state.data].length + 1;
+
       let pageSize = state.pagination.pageSize;
 
-      let current = Math.ceil(newCount / pageSize);
+      let current = Math.ceil(dataLength / pageSize);
 
       return {
         ...state,
@@ -33,11 +35,10 @@ const reducer = (state, action) => {
         data: [
           {
             key: 1,
-            code: "",
-            name: "",
-            desc: "",
-            qty: 0,
-            price: 0,
+            kode: "",
+            nama: "",
+            qty: 1,
+            harga: 0,
             total: 0,
           },
         ],
@@ -59,12 +60,12 @@ const reducer = (state, action) => {
 
       item[column] = newVal;
 
-      if (column === "qty" || column === "price")
-        item.total = item.qty * item.price;
+      if (column === "qty" || column === "harga")  {
+        if(!isNaN(newVal) && newVal > 0)
+          item.total = item.qty * item.harga;
+      }
 
       dataCopy[index] = item;
-
-      console.log(dataCopy);
 
       return {
         ...state,
