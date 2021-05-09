@@ -1,4 +1,4 @@
-import { useState, useEffect, useReducer } from "react";
+import { useEffect, useReducer } from "react";
 import {
   Button,
   Form,
@@ -7,15 +7,13 @@ import {
   DatePicker,
   Row,
   Col,
-  Popover,
   Popconfirm,
   Table,
   Card,
-  Space,
 } from "antd";
 import reducer from "./reducer.js";
 import moment from "moment";
-import {numberWithCommas, getFieldsOnTable} from "./util.js";
+import {numberWithCommas, numberWithCommasReverse, getFieldsOnTable} from "./util.js";
 
 const InvoiceForm = () => {
   const validateMessages = {
@@ -63,21 +61,7 @@ const InvoiceForm = () => {
   const [state, dispatch] = useReducer(reducer, defaultState);
 
   const handleFinish = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        console.log(values);
-      })
-      .catch((err) => console.log(err));
-  };
-
-  const handleFinishFailed = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        console.log(values);
-      })
-      .catch((err) => console.log(err));
+    
   };
 
   const isButtonDisabled = () => {
@@ -93,7 +77,7 @@ const InvoiceForm = () => {
         <h2>Info Faktur</h2>
       </Row>
       <Row>
-        <Col offset="3" span="18">
+        <Col offset="4" span="16">
           <Card>
             <Form
               {...layout}
@@ -101,7 +85,6 @@ const InvoiceForm = () => {
               layout="vertical"
               validateMessages={validateMessages}
               onFinish={handleFinish}
-              onFinishFailed={handleFinishFailed}
               scrollToFirstError
             >
               <Row>
@@ -201,30 +184,16 @@ const InvoiceForm = () => {
               <Row>
                 <Col span="23" offset="1">
                   <Form.Item label="Keterangan" {...fullLayout} name="note">
-                    <Input />
+                    <Input.TextArea />
                   </Form.Item>
                 </Col>
               </Row>
-              <Space direction="vertical" size="middle">
                 <ItemsTable
                   dispatch={dispatch}
                   state={state}
                   form={form}
                   isButtonDisabled={isButtonDisabled()}
                 />
-                <Row justify="end">
-                  <Form.Item>
-                    <Button
-                      type="primary"
-                      size="large"
-                      htmlType="submit"
-                      hidden={isButtonDisabled()}
-                    >
-                      Generate
-                    </Button>
-                  </Form.Item>
-                </Row>
-              </Space>
             </Form>
           </Card>
         </Col>
@@ -260,14 +229,20 @@ const ItemsTable = (props) => {
             ]}
             initialValue={props.state.data[index][dataIndex]}
             preserve={false}
+            style={{ "marginBottom": 0 }}
           >
             <InputNumber
+              {...(dataIndex === "harga" ? {
+                formatter: (value) => numberWithCommas(value),
+                parser: (value) => numberWithCommasReverse(value),
+                style: { width: "100%" },
+              } : {parser: (value) => parseInt(value), style: {width: "100%"}})}
               min={dataIndex === "harga" ? 0 : 1}
               onBlur={(e) =>
                 props.dispatch({
                   type: "UPDATE_INPUT_VALUE",
                   payload: {
-                    val: e.target.value,
+                    val: parseInt(e.target.value),
                     index: index,
                     column: dataIndex,
                   },
@@ -288,6 +263,7 @@ const ItemsTable = (props) => {
             ]}
             initialValue={props.state.data[index][dataIndex]}
             preserve={false}
+            style={{"marginBottom":0}}
           >
             <Input
               onBlur={(e) =>
@@ -331,7 +307,7 @@ const ItemsTable = (props) => {
       title: "Nama Barang",
       dataIndex: "nama",
       editable: true,
-      width: "35%",
+      width: "25%",
     },
     {
       title: "Qty",
@@ -412,7 +388,6 @@ const ItemsTable = (props) => {
   };
 
   const removeAll = () => {
-
     props.dispatch({ type: "REMOVE_ALL", payload: props.form });
   };
 
@@ -430,48 +405,58 @@ const ItemsTable = (props) => {
       });
   };
 
-  useEffect(() => {
-    console.log(props.form.getFieldsValue())
-  }, [props.state.data])
-
   return (
     <>
-      <Space direction="vertical" size="large">
-        <Row justify="end">
-          <Space direction="horizontal" size="large">
-            <Col>
-                <Button
-                  type="default"
-                  size="large"
-                  htmlType="button"
-                  hidden={props.isButtonDisabled}
-                  onClick={addItem}
-                >
-                  Tambah Barang Baru
-                </Button>
-            </Col>
-            <Col>
-              <Popconfirm
-                title="Yakin ingin hapus semua barang?"
-                onConfirm={removeAll}
-                okText="Yes"
-                cancelText="No"
-              >
-                <Button type="default" size="large" htmlType="button" danger>
-                  Hapus Semua Barang
-                </Button>
-              </Popconfirm>
-            </Col>
-          </Space>
-        </Row>
-        <Table
-          components={components}
-          dataSource={props.state.data}
-          columns={tableColumns}
-          pagination={props.state.pagination}
-          onChange={(pagination) => changePage(pagination)}
-        />
-      </Space>
+      <Row>
+        <Col span="23">
+          <Table
+            components={components}
+            dataSource={props.state.data}
+            columns={tableColumns}
+            pagination={props.state.pagination}
+            onChange={(pagination) => changePage(pagination)}
+          />
+        </Col>
+      </Row>
+      <Row justify="start">
+        <Col>
+          <Button
+            type="default"
+            size="large"
+            htmlType="button"
+            hidden={props.isButtonDisabled}
+            onClick={addItem}
+          >
+            Tambah Barang Baru
+          </Button>
+        </Col>
+        <Col>
+          <Col offset="3">
+            <Popconfirm
+              title="Yakin ingin hapus semua barang?"
+              onConfirm={removeAll}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button type="default" size="large" htmlType="button" danger>
+                Hapus Semua Barang
+              </Button>
+            </Popconfirm>
+          </Col>
+        </Col>
+        <Col offset="12">
+          <Form.Item style={{ "marginBottom": 0 }}>
+            <Button
+              type="primary"
+              size="large"
+              htmlType="submit"
+              hidden={props.isButtonDisabled}
+            >
+              Generate
+            </Button>
+          </Form.Item>
+        </Col>
+      </Row>
     </>
   );
 };

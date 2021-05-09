@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "antd": "^4.15.4"
+    "antd": "^4.15.4",
+    "react-to-print": "^2.12.4"
   },
   "devDependencies": {},
   "scripts": {

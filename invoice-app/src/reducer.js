@@ -65,11 +65,17 @@ const reducer = (state, action) => {
 
       let item = { ...dataCopy[index] };
 
+      //prevent qty 0
+      if (column === "qty" && newVal === 0) {
+        newVal = 1;
+        console.log(newVal);;
+      }
+
       item[column] = newVal;
 
-      if (column === "qty" || column === "harga")  {
-        if(!isNaN(newVal) && newVal > 0)
-          item.total = item.qty * item.harga;
+      // calculate total automatically
+      if (column === "qty" || column === "harga") {
+        if (!isNaN(newVal) && newVal > 0) item.total = item.qty * item.harga;
       }
 
       dataCopy[index] = item;

@@ -1,7 +1,9 @@
 const numberWithCommas = (x) => {
-  var parts = x.toString().split(".");
-  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  return parts.join(",");
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+};
+
+const numberWithCommasReverse = (x) => {
+  return x.toString().replace(/./g, "");
 };
 
 const getFieldsOnTable = (fields) => {
@@ -10,4 +12,4 @@ const getFieldsOnTable = (fields) => {
   return keys.filter((key) => regex.test(key));
 };
 
-export { numberWithCommas, getFieldsOnTable };
+export { numberWithCommas, numberWithCommasReverse, getFieldsOnTable };
