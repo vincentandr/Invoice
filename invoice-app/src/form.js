@@ -7,6 +7,7 @@ import {
   DatePicker,
   Row,
   Col,
+  Popover,
   Popconfirm,
   Table,
   Card,
@@ -14,7 +15,7 @@ import {
 } from "antd";
 import reducer from "./reducer.js";
 import moment from "moment";
-import numberWithCommas from "./util.js";
+import {numberWithCommas, getFieldsOnTable} from "./util.js";
 
 const InvoiceForm = () => {
   const validateMessages = {
@@ -211,13 +212,13 @@ const InvoiceForm = () => {
                   form={form}
                   isButtonDisabled={isButtonDisabled()}
                 />
-                <Row justify="center">
+                <Row justify="end">
                   <Form.Item>
                     <Button
                       type="primary"
                       size="large"
                       htmlType="submit"
-                      disabled={isButtonDisabled()}
+                      hidden={isButtonDisabled()}
                     >
                       Generate
                     </Button>
@@ -258,6 +259,7 @@ const ItemsTable = (props) => {
               },
             ]}
             initialValue={props.state.data[index][dataIndex]}
+            preserve={false}
           >
             <InputNumber
               min={dataIndex === "harga" ? 0 : 1}
@@ -285,6 +287,7 @@ const ItemsTable = (props) => {
               },
             ]}
             initialValue={props.state.data[index][dataIndex]}
+            preserve={false}
           >
             <Input
               onBlur={(e) =>
@@ -383,8 +386,10 @@ const ItemsTable = (props) => {
   });
 
   const addItem = () => {
+    const toBeReset = getFieldsOnTable(props.form.getFieldsValue());
+
     props.form
-      .validateFields()
+      .validateFields(toBeReset)
       .then((values) => {
         const newRow = {
           key: props.state.count + 1,
@@ -407,14 +412,15 @@ const ItemsTable = (props) => {
   };
 
   const removeAll = () => {
-    props.dispatch({ type: "REMOVE_ALL", payload: props.form });
 
-    setIsRemoveAll(!isRemoveAll);
+    props.dispatch({ type: "REMOVE_ALL", payload: props.form });
   };
 
   const changePage = (page) => {
+    const toBeReset = getFieldsOnTable(props.form.getFieldsValue());
+
     props.form
-      .validateFields()
+      .validateFields(toBeReset)
       .then((values) => {
             props.dispatch({ type: "CHANGE_PAGE", payload: page.current });
       })
@@ -424,57 +430,39 @@ const ItemsTable = (props) => {
       });
   };
 
-  const [isRemoveAll, setIsRemoveAll] = useState(false);
-
   useEffect(() => {
-    let keys = Object.keys(props.form.getFieldsValue());
-
-    let regex = new RegExp("^kode|^qty|^nama|^harga");
-
-    let toBeReset = keys.filter((key) => regex.test(key));
-
-    props.form.resetFields(toBeReset);
-  }, [isRemoveAll])
+    console.log(props.form.getFieldsValue())
+  }, [props.state.data])
 
   return (
     <>
       <Space direction="vertical" size="large">
-        <Row>
-          <Col span="5" offset="6">
-            <Button
-              type="default"
-              size="large"
-              htmlType="button"
-              disabled={
-                // only active if last page
-                Math.ceil(
-                  props.state.data.length / props.state.pagination.pageSize
-                ) !== props.state.pagination.current
-              }
-              onClick={addItem}
-            >
-              Tambah Barang Baru
-            </Button>
-          </Col>
-          <Col span="4" offset="2">
-            <Popconfirm
-              title="Yakin ingin hapus semua barang?"
-              onConfirm={removeAll}
-              okText="Yes"
-              cancelText="No"
-              disabled={props.isButtonDisabled}
-            >
-              <Button
-                type="default"
-                size="large"
-                htmlType="button"
-                disabled={props.isButtonDisabled}
-                danger
+        <Row justify="end">
+          <Space direction="horizontal" size="large">
+            <Col>
+                <Button
+                  type="default"
+                  size="large"
+                  htmlType="button"
+                  hidden={props.isButtonDisabled}
+                  onClick={addItem}
+                >
+                  Tambah Barang Baru
+                </Button>
+            </Col>
+            <Col>
+              <Popconfirm
+                title="Yakin ingin hapus semua barang?"
+                onConfirm={removeAll}
+                okText="Yes"
+                cancelText="No"
               >
-                Hapus Semua Barang
-              </Button>
-            </Popconfirm>
-          </Col>
+                <Button type="default" size="large" htmlType="button" danger>
+                  Hapus Semua Barang
+                </Button>
+              </Popconfirm>
+            </Col>
+          </Space>
         </Row>
         <Table
           components={components}

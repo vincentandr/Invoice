@@ -4,4 +4,10 @@ const numberWithCommas = (x) => {
   return parts.join(",");
 };
 
-export default numberWithCommas;
+const getFieldsOnTable = (fields) => {
+  let keys = Object.keys(fields);
+  let regex = new RegExp("^kode|^qty|^nama|^harga");
+  return keys.filter((key) => regex.test(key));
+};
+
+export { numberWithCommas, getFieldsOnTable };

@@ -24,9 +24,16 @@ const reducer = (state, action) => {
       let dataCopy = [...state.data];
 
       let newItems = dataCopy.filter((item) => item.key !== key);
+
+      let current = state.pagination.current;
+
+      // redirect to previous page if the deleted item is the first and only item of current page
+      if (newItems.length % state.pagination.pageSize === 0)
+        current = current - 1;      
       return {
         ...state,
         data: newItems,
+        pagination: { ...state.pagination, current: current },
       };
     }
     case "REMOVE_ALL": {
