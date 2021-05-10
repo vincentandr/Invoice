@@ -42,10 +42,10 @@ const reducer = (state, action) => {
         data: [
           {
             id: 1,
-            kode: "",
-            nama: "",
+            code: "",
+            name: "",
             qty: 1,
-            harga: 0,
+            price: 0,
             total: 0,
           },
         ],
@@ -68,14 +68,14 @@ const reducer = (state, action) => {
       //prevent qty 0
       if (column === "qty" && newVal === 0) {
         newVal = 1;
-        console.log(newVal);;
+        console.log(newVal);
       }
 
       item[column] = newVal;
 
       // calculate total automatically
-      if (column === "qty" || column === "harga") {
-        if (!isNaN(newVal) && newVal > 0) item.total = item.qty * item.harga;
+      if (column === "qty" || column === "price") {
+        if (!isNaN(newVal) && newVal > 0) item.total = item.qty * item.price;
       }
 
       dataCopy[index] = item;
