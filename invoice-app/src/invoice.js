@@ -1,5 +1,7 @@
 import React from "react";
 import { numberWithCommas } from "./util.js";
+import NumberFormat from "react-number-format";
+
 
 const invoiceStyle = `
   @media print {  
@@ -65,7 +67,17 @@ class Invoice extends React.PureComponent {
               return (
                 <tr key={outerIndex}>
                   {Object.keys(item).map((key, innerIndex) => (
-                    <td key={innerIndex}>{item[key]}</td>
+                    <td key={innerIndex}>
+                      {key === "price" || key === "total" ? (
+                        <NumberFormat
+                          format={numberWithCommas}
+                          displayType="text"
+                          value={item[key]}
+                        />
+                      ) : (
+                        item[key]
+                      )}
+                    </td>
                   ))}
                 </tr>
               );

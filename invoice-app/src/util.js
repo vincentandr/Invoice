@@ -2,8 +2,14 @@ const numberWithCommas = (x) => {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 };
 
-const numberWithCommasReverse = (x) => {
-  return x.toString().replace(/./g, "");
+const qtyFormat = (input) => {
+  const { value } = input;
+  if (value > 0) return input;
+};
+
+const priceFormat = (input) => {
+  const { value } = input;
+  if (value >= 0) return input;
 };
 
 const getFieldsOnTable = (fields) => {
@@ -12,4 +18,4 @@ const getFieldsOnTable = (fields) => {
   return keys.filter((key) => regex.test(key));
 };
 
-export { numberWithCommas, numberWithCommasReverse, getFieldsOnTable };
+export { numberWithCommas, getFieldsOnTable, qtyFormat, priceFormat };

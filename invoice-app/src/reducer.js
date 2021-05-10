@@ -65,12 +65,6 @@ const reducer = (state, action) => {
 
       let item = { ...dataCopy[index] };
 
-      //prevent qty 0
-      if (column === "qty" && newVal === 0) {
-        newVal = 1;
-        console.log(newVal);
-      }
-
       item[column] = newVal;
 
       // calculate total automatically

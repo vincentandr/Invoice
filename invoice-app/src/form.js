@@ -3,7 +3,6 @@ import {
   Button,
   Form,
   Input,
-  InputNumber,
   DatePicker,
   Row,
   Col,
@@ -11,13 +10,15 @@ import {
   Table,
   Card,
 } from "antd";
+import NumberFormat from "react-number-format";
 import { useReactToPrint } from "react-to-print";
 import reducer from "./reducer.js";
 import moment from "moment";
 import {
   numberWithCommas,
-  numberWithCommasReverse,
   getFieldsOnTable,
+  qtyFormat,
+  priceFormat,
 } from "./util.js";
 import { Invoice, invoiceStyle} from "./invoice.js";
 
@@ -218,94 +219,97 @@ const InvoiceForm = () => {
   );
 };
 
-const ItemsTable = (props) => {
-  const EditableCell = ({
-    editable,
-    record,
-    children,
-    dataIndex,
-    rowIndex,
-    ...restProps
-  }) => {
-    let childNode = children;
+const EditableCell = ({
+  editable,
+  record,
+  children,
+  dataIndex,
+  rowIndex,
+  title,
+  state,
+  dispatch,
+  ...restProps
+}) => {
+  let childNode = children;
 
-    if (editable) {
-      let page = { ...props.state.pagination };
-      let index = rowIndex + (page.current - 1) * page.pageSize;
+  if (editable) {
+    let page = { ...state.pagination };
+    let index = rowIndex + (page.current - 1) * page.pageSize;
 
-      if (dataIndex === "qty" || dataIndex === "price") {
-        childNode = (
-          <Form.Item
-            name={`${dataIndex}${index}`}
-            rules={[
-              {
-                required: true,
-                message: `${dataIndex} tidak boleh kosong`,
-              },
-            ]}
-            initialValue={props.state.data[index][dataIndex]}
-            preserve={false}
-            style={{ marginBottom: 0 }}
-          >
-            <InputNumber
-              {...(dataIndex === "price"
-                ? {
-                    formatter: (value) => numberWithCommas(value),
-                    parser: (value) => numberWithCommasReverse(value),
-                    style: { width: "100%" },
-                  }
-                : {
-                    parser: (value) => parseInt(value),
-                    style: { width: "100%" },
-                  })}
-              min={dataIndex === "price" ? 0 : 1}
-              onBlur={(e) =>
-                props.dispatch({
-                  type: "UPDATE_INPUT_VALUE",
-                  payload: {
-                    val: parseInt(e.target.value),
-                    index: index,
-                    column: dataIndex,
-                  },
-                })
-              }
-            />
-          </Form.Item>
-        );
-      } else {
-        childNode = (
-          <Form.Item
-            name={`${dataIndex}${index}`}
-            rules={[
-              {
-                required: true,
-                message: `${dataIndex} tidak boleh kosong`,
-              },
-            ]}
-            initialValue={props.state.data[index][dataIndex]}
-            preserve={false}
-            style={{ marginBottom: 0 }}
-          >
-            <Input
-              onBlur={(e) =>
-                props.dispatch({
-                  type: "UPDATE_INPUT_VALUE",
-                  payload: {
-                    val: e.target.value,
-                    index: index,
-                    column: dataIndex,
-                  },
-                })
-              }
-            />
-          </Form.Item>
-        );
-      }
+    if (dataIndex === "qty" || dataIndex === "price") {
+      childNode = (
+        <Form.Item
+          name={`${dataIndex}${index}`}
+          rules={[
+            {
+              required: true,
+              message: `${title} tidak boleh kosong`,
+            },
+          ]}
+          initialValue={state.data[index][dataIndex]}
+          preserve={false}
+          style={{ marginBottom: 0 }}
+        >
+          <NumberFormat
+            {...(dataIndex === "price" ? {
+              format:numberWithCommas,
+              isAllowed:priceFormat} 
+            : {
+              isAllowed:qtyFormat
+            })}
+            value={state.data[index][dataIndex]}
+            displayType="input"
+            customInput={Input}
+            style={{ width: "100%" }}
+            onValueChange={(values) => {
+              const { value } = values;
+              dispatch({
+                type: "UPDATE_INPUT_VALUE",
+                payload: {
+                  val: parseInt(value),
+                  index: index,
+                  column: dataIndex,
+                },
+              });
+            }}
+          />
+        </Form.Item>
+      );
+    } else {
+      childNode = (
+        <Form.Item
+          name={`${dataIndex}${index}`}
+          rules={[
+            {
+              required: true,
+              message: `${title} tidak boleh kosong`,
+            },
+          ]}
+          initialValue={state.data[index][dataIndex]}
+          preserve={false}
+          style={{ marginBottom: 0 }}
+        >
+          <Input
+            onBlur={(e) =>
+              dispatch({
+                type: "UPDATE_INPUT_VALUE",
+                payload: {
+                  val: e.target.value,
+                  index: index,
+                  column: dataIndex,
+                },
+              })
+            }
+          />
+        </Form.Item>
+      );
     }
+  }
 
-    return <td {...restProps}>{childNode}</td>;
-  };
+  return <td {...restProps}>{childNode}</td>;
+};
 
+const ItemsTable = (props) => {
   const components = {
     body: {
       cell: EditableCell,
@@ -350,7 +354,7 @@ const ItemsTable = (props) => {
           index +
           (props.state.pagination.current - 1) *
             props.state.pagination.pageSize;
-        return numberWithCommas(props.state.data[idx].total);
+        return <NumberFormat format={numberWithCommas} displayType="text" value={props.state.data[idx].total}/>;
       },
     },
     {
@@ -378,11 +382,15 @@ const ItemsTable = (props) => {
         editable: col.editable,
         dataIndex: col.dataIndex,
         title: col.title,
+        state: props.state,
+        dispatch: props.dispatch,
       }),
     };
   });
 
   const addItem = () => {
+    console.log(props.state.data);
+    console.log(props.form.getFieldsValue());
     const toBeReset = getFieldsOnTable(props.form.getFieldsValue());
 
     const newRow = {
@@ -395,7 +403,7 @@ const ItemsTable = (props) => {
     };
 
     // validate before adding new item creates a new page
-    if(props.state.data.length % props.state.pagination.pageSize === 0){
+    if (props.state.data.length % props.state.pagination.pageSize === 0) {
       props.form
         .validateFields(toBeReset)
         .then((values) => {
@@ -404,7 +412,7 @@ const ItemsTable = (props) => {
         .catch((err) => {
           console.log("error");
         });
-    }else{
+    } else {
       props.dispatch({ type: "ADD_ITEM", payload: newRow });
     }
   };
