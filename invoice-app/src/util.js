@@ -8,7 +8,7 @@ const numberWithCommasReverse = (x) => {
 
 const getFieldsOnTable = (fields) => {
   let keys = Object.keys(fields);
-  let regex = new RegExp("^kode|^qty|^nama|^harga");
+  let regex = new RegExp("^code|^qty|^name|^price");
   return keys.filter((key) => regex.test(key));
 };
 

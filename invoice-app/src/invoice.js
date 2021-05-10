@@ -48,11 +48,11 @@ class Invoice extends React.PureComponent {
             </tr>
           </thead>
           <tbody>
-            {this.props.state.data.map((item) => {
+            {this.props.state.data.map((item, outerIndex) => {
               return (
-                <tr>
-                  {Object.keys(item).map((key, index) => (
-                    <td key={index}>{item[key]}</td>
+                <tr key={outerIndex}>
+                  {Object.keys(item).map((key, innerIndex) => (
+                    <td key={innerIndex}>{item[key]}</td>
                   ))}
                 </tr>
               );

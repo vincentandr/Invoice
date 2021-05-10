@@ -48,15 +48,15 @@ const InvoiceForm = () => {
     data: [
       {
         id: 1,
-        kode: "",
-        nama: "",
+        code: "",
+        name: "",
         qty: 1,
-        harga: 0,
+        price: 0,
         total: 0,
       },
     ],
-    info: {
-      
+    buyerInfo: {
+      name: "",
     },
     columns: ["No.", "Kode Barang", "Nama Barang", "Qty", "Harga", "Total"],
     pagination: {
@@ -233,7 +233,7 @@ const ItemsTable = (props) => {
       let page = { ...props.state.pagination };
       let index = rowIndex + (page.current - 1) * page.pageSize;
 
-      if (dataIndex === "qty" || dataIndex === "harga") {
+      if (dataIndex === "qty" || dataIndex === "price") {
         childNode = (
           <Form.Item
             name={`${dataIndex}${index}`}
@@ -248,7 +248,7 @@ const ItemsTable = (props) => {
             style={{ marginBottom: 0 }}
           >
             <InputNumber
-              {...(dataIndex === "harga"
+              {...(dataIndex === "price"
                 ? {
                     formatter: (value) => numberWithCommas(value),
                     parser: (value) => numberWithCommasReverse(value),
@@ -258,7 +258,7 @@ const ItemsTable = (props) => {
                     parser: (value) => parseInt(value),
                     style: { width: "100%" },
                   })}
-              min={dataIndex === "harga" ? 0 : 1}
+              min={dataIndex === "price" ? 0 : 1}
               onBlur={(e) =>
                 props.dispatch({
                   type: "UPDATE_INPUT_VALUE",
@@ -314,36 +314,36 @@ const ItemsTable = (props) => {
 
   const columns = [
     {
-      title: "No.",
+      title: props.state.columns[0],
       dataIndex: "id",
       width: "5%",
     },
     {
-      title: "Kode Barang",
-      dataIndex: "kode",
+      title: props.state.columns[1],
+      dataIndex: "code",
       editable: true,
       width: "15%",
     },
     {
-      title: "Nama Barang",
-      dataIndex: "nama",
+      title: props.state.columns[2],
+      dataIndex: "name",
       editable: true,
       width: "25%",
     },
     {
-      title: "Qty",
+      title: props.state.columns[3],
       dataIndex: "qty",
       editable: true,
       width: "10%",
     },
     {
-      title: "Harga (Rp.)",
-      dataIndex: "harga",
+      title: props.state.columns[4],
+      dataIndex: "price",
       editable: true,
       width: "15%",
     },
     {
-      title: "Total (Rp.)",
+      title: props.state.columns[5],
       dataIndex: "total",
       render: (text, _, index) => {
         let idx =
@@ -387,10 +387,10 @@ const ItemsTable = (props) => {
 
     const newRow = {
       id: props.state.count + 1,
-      kode: "",
-      nama: "",
+      code: "",
+      name: "",
       qty: 1,
-      harga: 0,
+      price: 0,
       total: 0,
     };
 
@@ -440,6 +440,7 @@ const ItemsTable = (props) => {
             columns={tableColumns}
             pagination={props.state.pagination}
             onChange={(pagination) => changePage(pagination)}
+            rowKey="id"
           />
         </Col>
       </Row>
