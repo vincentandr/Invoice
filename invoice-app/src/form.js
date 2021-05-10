@@ -1,4 +1,4 @@
-import { useEffect, useReducer } from "react";
+import { useRef, useReducer } from "react";
 import {
   Button,
   Form,
@@ -11,9 +11,15 @@ import {
   Table,
   Card,
 } from "antd";
+import { useReactToPrint } from "react-to-print";
 import reducer from "./reducer.js";
 import moment from "moment";
-import {numberWithCommas, numberWithCommasReverse, getFieldsOnTable} from "./util.js";
+import {
+  numberWithCommas,
+  numberWithCommasReverse,
+  getFieldsOnTable,
+} from "./util.js";
+import { Invoice, invoiceStyle} from "./invoice.js";
 
 const InvoiceForm = () => {
   const validateMessages = {
@@ -41,7 +47,7 @@ const InvoiceForm = () => {
   const defaultState = {
     data: [
       {
-        key: 1,
+        id: 1,
         kode: "",
         nama: "",
         qty: 1,
@@ -49,6 +55,10 @@ const InvoiceForm = () => {
         total: 0,
       },
     ],
+    info: {
+      
+    },
+    columns: ["No.", "Kode Barang", "Nama Barang", "Qty", "Harga", "Total"],
     pagination: {
       current: 1,
       pageSize: 5,
@@ -59,10 +69,13 @@ const InvoiceForm = () => {
 
   const [form] = Form.useForm();
   const [state, dispatch] = useReducer(reducer, defaultState);
+  const invoiceToPrint = useRef();
 
-  const handleFinish = () => {
-    
-  };
+  const handleFinish = useReactToPrint({
+    content: () => invoiceToPrint.current,
+    pageStyle:
+      invoiceStyle,
+  });
 
   const isButtonDisabled = () => {
     return (
@@ -73,6 +86,9 @@ const InvoiceForm = () => {
 
   return (
     <>
+      <div style={{ overflow: "hidden", height: 0   }}>
+        <Invoice ref={invoiceToPrint} state={state}/>
+      </div>
       <Row justify="center">
         <h2>Info Faktur</h2>
       </Row>
@@ -188,12 +204,12 @@ const InvoiceForm = () => {
                   </Form.Item>
                 </Col>
               </Row>
-                <ItemsTable
-                  dispatch={dispatch}
-                  state={state}
-                  form={form}
-                  isButtonDisabled={isButtonDisabled()}
-                />
+              <ItemsTable
+                dispatch={dispatch}
+                state={state}
+                form={form}
+                isButtonDisabled={isButtonDisabled()}
+              />
             </Form>
           </Card>
         </Col>
@@ -229,14 +245,19 @@ const ItemsTable = (props) => {
             ]}
             initialValue={props.state.data[index][dataIndex]}
             preserve={false}
-            style={{ "marginBottom": 0 }}
+            style={{ marginBottom: 0 }}
           >
             <InputNumber
-              {...(dataIndex === "harga" ? {
-                formatter: (value) => numberWithCommas(value),
-                parser: (value) => numberWithCommasReverse(value),
-                style: { width: "100%" },
-              } : {parser: (value) => parseInt(value), style: {width: "100%"}})}
+              {...(dataIndex === "harga"
+                ? {
+                    formatter: (value) => numberWithCommas(value),
+                    parser: (value) => numberWithCommasReverse(value),
+                    style: { width: "100%" },
+                  }
+                : {
+                    parser: (value) => parseInt(value),
+                    style: { width: "100%" },
+                  })}
               min={dataIndex === "harga" ? 0 : 1}
               onBlur={(e) =>
                 props.dispatch({
@@ -263,7 +284,7 @@ const ItemsTable = (props) => {
             ]}
             initialValue={props.state.data[index][dataIndex]}
             preserve={false}
-            style={{"marginBottom":0}}
+            style={{ marginBottom: 0 }}
           >
             <Input
               onBlur={(e) =>
@@ -294,7 +315,7 @@ const ItemsTable = (props) => {
   const columns = [
     {
       title: "No.",
-      dataIndex: "key",
+      dataIndex: "id",
       width: "5%",
     },
     {
@@ -337,7 +358,7 @@ const ItemsTable = (props) => {
       dataIndex: "remove",
       render: (_, record) =>
         props.state.data.length > 1 ? (
-          <Button type="default" danger onClick={() => removeItem(record.key)}>
+          <Button type="default" danger onClick={() => removeItem(record.id)}>
             Hapus
           </Button>
         ) : null,
@@ -364,27 +385,32 @@ const ItemsTable = (props) => {
   const addItem = () => {
     const toBeReset = getFieldsOnTable(props.form.getFieldsValue());
 
-    props.form
-      .validateFields(toBeReset)
-      .then((values) => {
-        const newRow = {
-          key: props.state.count + 1,
-          kode: "",
-          nama: "",
-          qty: 1,
-          harga: 0,
-          total: 0,
-        };
+    const newRow = {
+      id: props.state.count + 1,
+      kode: "",
+      nama: "",
+      qty: 1,
+      harga: 0,
+      total: 0,
+    };
 
-        props.dispatch({ type: "ADD_ITEM", payload: newRow });
-      })
-      .catch((err) => {
-        console.log("error");
-      });
+    // validate before adding new item creates a new page
+    if(props.state.data.length % props.state.pagination.pageSize === 0){
+      props.form
+        .validateFields(toBeReset)
+        .then((values) => {
+          props.dispatch({ type: "ADD_ITEM", payload: newRow });
+        })
+        .catch((err) => {
+          console.log("error");
+        });
+    }else{
+      props.dispatch({ type: "ADD_ITEM", payload: newRow });
+    }
   };
 
-  const removeItem = (key) => {
-    props.dispatch({ type: "REMOVE_ITEM", payload: key });
+  const removeItem = (id) => {
+    props.dispatch({ type: "REMOVE_ITEM", payload: id });
   };
 
   const removeAll = () => {
@@ -397,11 +423,10 @@ const ItemsTable = (props) => {
     props.form
       .validateFields(toBeReset)
       .then((values) => {
-            props.dispatch({ type: "CHANGE_PAGE", payload: page.current });
+        props.dispatch({ type: "CHANGE_PAGE", payload: page.current });
       })
       .catch((err) => {
         console.log("error");
-
       });
   };
 
@@ -445,7 +470,7 @@ const ItemsTable = (props) => {
           </Col>
         </Col>
         <Col offset="12">
-          <Form.Item style={{ "marginBottom": 0 }}>
+          <Form.Item style={{ marginBottom: 0 }}>
             <Button
               type="primary"
               size="large"

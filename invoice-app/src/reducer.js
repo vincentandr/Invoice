@@ -19,11 +19,11 @@ const reducer = (state, action) => {
       };
     }
     case "REMOVE_ITEM": {
-      let key = action.payload;
+      let id = action.payload;
 
       let dataCopy = [...state.data];
 
-      let newItems = dataCopy.filter((item) => item.key !== key);
+      let newItems = dataCopy.filter((item) => item.id !== id);
 
       let current = state.pagination.current;
 
@@ -41,7 +41,7 @@ const reducer = (state, action) => {
         ...state,
         data: [
           {
-            key: 1,
+            id: 1,
             kode: "",
             nama: "",
             qty: 1,
