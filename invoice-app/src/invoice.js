@@ -21,7 +21,12 @@ const invoiceStyle = `
         width: 100%;
       }
 
-      table, table th{
+      table td{
+        border-left: solid 1px black;
+        border-right: solid 1px black;
+      }
+
+      table,  table th{
         border: solid 1px black;
       }
       p {
@@ -40,6 +45,14 @@ class Invoice extends React.PureComponent {
           <SellerCompany />
         </header>
         <table>
+          <colgroup>
+            <col span="1" style={{ width: "5%" }} />
+            <col span="1" style={{ width: "15%" }} />
+            <col span="1" style={{ width: "35%" }} />
+            <col span="1" style={{ width: "10%" }} />
+            <col span="1" style={{ width: "10%" }} />
+            <col span="1" style={{ width: "10%" }} />
+          </colgroup>
           <thead>
             <tr>
               {this.props.state.columns.map((column, index) => (
