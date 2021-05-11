@@ -9,32 +9,60 @@ const invoiceStyle = `
       size: 21.59cm 13.97cm;
     } 
 
-    #sellerCompany{
-      margin-top:0.3cm;
+    .numeric{
+      text-align:right;
     }
 
-      div {
-          font-size: 10px;
-        }
-     footer {
-         font-size: 36px;
-     }
+    #invoice{
+      font-size: 0.7em;
+    }
+
+    #top {
+      display:flex;
+      justify-content:center;
+      align-items:center;
+    }
+
+    header {
+      display:flex;
+    }
+
+    #title{
+      margin-left: auto;
+    }
+
+    #invoiceNo{
+      margin-left: auto;
+    }
+
+    #buyerCompany{
+      margin-left: auto;
+    }
+
      table{
         width: 100%;
+        font-size: 1.2em;
       }
 
-      table td{
+      table td, table th{
         border-left: solid 1px black;
         border-right: solid 1px black;
+        padding-left: 1mm;
+        padding-right: 1mm;
       }
 
-      table,  table th{
+      table, table th, table #note, table #grandTotal{
         border: solid 1px black;
       }
-      p {
-        margin: 0px;
-        padding: 0px;
-        line-height:3px;
+
+      table #note{
+        border: none;
+        height: 3em;
+        overflow: hidden;
+      }
+
+      h3 {
+        line-height:1em;
       }
     }
   `;
@@ -43,8 +71,15 @@ class Invoice extends React.PureComponent {
   render() {
     return (
       <div id="invoice">
+        <div id="top">
+          <h1 id="title">FAKTUR PENJUALAN</h1>
+          <h3 id="invoiceNo">
+            No. faktur: {this.props.state.buyerInfo.number}
+          </h3>
+        </div>
         <header>
           <SellerCompany />
+          <BuyerCompany {...this.props.state.buyerInfo} />
         </header>
         <table>
           <colgroup>
@@ -58,7 +93,16 @@ class Invoice extends React.PureComponent {
           <thead>
             <tr>
               {this.props.state.columns.map((column, index) => (
-                <th key={index}>{column}</th>
+                <th
+                  key={index}
+                  {...((column.toLowerCase() === "harga" ||
+                    column.toLowerCase() === "total" ||
+                    column.toLowerCase() === "qty") && {
+                    className: "numeric",
+                  })}
+                >
+                  {column}
+                </th>
               ))}
             </tr>
           </thead>
@@ -66,27 +110,60 @@ class Invoice extends React.PureComponent {
             {this.props.state.data.map((item, outerIndex) => {
               return (
                 <tr key={outerIndex}>
-                  {Object.keys(item).map((key, innerIndex) => (
-                    <td key={innerIndex}>
-                      {key === "price" || key === "total" ? (
+                  {Object.keys(item).map((column, innerIndex) => (
+                    <td
+                      key={innerIndex}
+                      {...((column === "price" || column === "qty") && {
+                        className: "numeric",
+                      })}
+                    >
+                      {column === "price" ? (
                         <NumberFormat
                           format={numberWithCommas}
                           displayType="text"
-                          value={item[key]}
+                          value={item[column]}
                         />
                       ) : (
-                        item[key]
+                        item[column]
                       )}
                     </td>
                   ))}
+                  <td className="numeric">
+                    <NumberFormat
+                      format={numberWithCommas}
+                      displayType="text"
+                      value={item.qty * item.price}
+                    />
+                  </td>
                 </tr>
               );
             })}
+            <tr className="numeric" id="grandTotal">
+              <td colSpan="5">Grand total:</td>
+              <td>{numberWithCommas(this.props.state.grandTotal)}</td>
+            </tr>
+            <tr>
+              <td colSpan="6">
+                <div id="note">
+                  Keterangan: Lorem ipsum dolor sit amet consectetur adipisicing
+                  elit. Quae consequatur illo nostrum facilis iusto qui debitis
+                  perferendis cum iure corrupti. Reprehenderit eius repudiandae
+                  fugit nisi incidunt eligendi tempore, explicabo mollitia.
+                  Lorem ipsum dolor sit amet consectetur, adipisicing elit.
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Magni
+                  eveniet labore temporibus illum, ullam modi corporis facilis
+                  asperiores quasi itaque soluta amet? Tempore qui, iusto rem
+                  eveniet libero dolor fuga. Quae atque, reiciendis iste
+                  consectetur tenetur ipsum, nobis omnis rerum illo quos dolorem
+                  obcaecati similique nam magni tempore ratione esse quam
+                  laborum?
+                  {this.props.state.buyerInfo.note}
+                </div>
+              </td>
+            </tr>
           </tbody>
         </table>
-        <footer>
-          <div>test</div>
-        </footer>
+        <footer></footer>
       </div>
     );
   }
@@ -95,19 +172,19 @@ class Invoice extends React.PureComponent {
 const SellerCompany = () => {
   return (
     <div id="sellerCompany">
-      <p>Jl. Penghela no. 14</p>
-      <p>Surabaya</p>
-      <p>0315460169</p>
+      <h1>Logo</h1>
+      <h3>031 5460169</h3>
     </div>
   );
 };
 
-const BuyerCompany = () => {
+const BuyerCompany = (props) => {
   return (
-    <div id="sellerCompany">
-      <p>Jl. Penghela no. 14</p>
-      <p>Surabaya</p>
-      <p>0315460169</p>
+    <div id="buyerCompany">
+      <h3>Kepada Yth.</h3>
+      <h3>{props.name}</h3>
+      <h3>{props.address}</h3>
+      <h3>{props.city}</h3>
     </div>
   );
 };

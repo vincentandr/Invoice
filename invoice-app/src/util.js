@@ -18,4 +18,14 @@ const getFieldsOnTable = (fields) => {
   return keys.filter((key) => regex.test(key));
 };
 
-export { numberWithCommas, getFieldsOnTable, qtyFormat, priceFormat };
+const calculateGrandTotal = (data) => {
+  return data.reduce((sum, item2) => sum + item2.qty * item2.price, 0);
+};
+
+export {
+  numberWithCommas,
+  getFieldsOnTable,
+  qtyFormat,
+  priceFormat,
+  calculateGrandTotal,
+};

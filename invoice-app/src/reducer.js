@@ -1,3 +1,5 @@
+import {calculateGrandTotal} from "./util.js"
+
 const reducer = (state, action) => {
   switch (action.type) {
     case "ADD_ITEM": {
@@ -25,15 +27,18 @@ const reducer = (state, action) => {
 
       let newItems = dataCopy.filter((item) => item.id !== id);
 
+      let grandTotal = calculateGrandTotal(newItems);
+
       let current = state.pagination.current;
 
       // redirect to previous page if the deleted item is the first and only item of current page
       if (newItems.length % state.pagination.pageSize === 0)
-        current = current - 1;      
+        current = current - 1;
       return {
         ...state,
         data: newItems,
         pagination: { ...state.pagination, current: current },
+        grandTotal: grandTotal,
       };
     }
     case "REMOVE_ALL": {
@@ -46,9 +51,9 @@ const reducer = (state, action) => {
             name: "",
             qty: 1,
             price: 0,
-            total: 0,
           },
         ],
+        grandTotal:   0,
         count: 1,
         pagination: {
           ...state.pagination,
@@ -56,7 +61,20 @@ const reducer = (state, action) => {
         },
       };
     }
-    case "UPDATE_INPUT_VALUE": {
+    case "UPDATE_FORM_INPUT_VALUE": {
+      let val = action.payload.value;
+      let name = action.payload.name;
+
+      let dataCopy = { ...state.buyerInfo };
+
+      dataCopy[name] = val;
+
+      return {
+        ...state,
+        buyerInfo: { ...dataCopy },
+      };
+    }
+    case "UPDATE_TABLE_INPUT_VALUE": {
       let index = action.payload.index;
       let newVal = action.payload.val;
       let column = action.payload.column;
@@ -67,16 +85,14 @@ const reducer = (state, action) => {
 
       item[column] = newVal;
 
-      // calculate total automatically
-      if (column === "qty" || column === "price") {
-        if (!isNaN(newVal) && newVal > 0) item.total = item.qty * item.price;
-      }
-
       dataCopy[index] = item;
+
+      let grandTotal = calculateGrandTotal(dataCopy);
 
       return {
         ...state,
         data: [...dataCopy],
+        grandTotal: grandTotal,
       };
     }
     case "TOGGLE_MODAL":

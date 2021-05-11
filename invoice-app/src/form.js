@@ -53,11 +53,17 @@ const InvoiceForm = () => {
         name: "",
         qty: 1,
         price: 0,
-        total: 0,
       },
     ],
+    grandTotal:   0,
     buyerInfo: {
       name: "",
+      number: "",
+      address: "",
+      date: moment(new Date()).format("DD-MM-YYYY"),
+      due: moment(new Date()).add(30, "days").format("DD-MM-YYYY"),
+      city: "",
+      note: "",
     },
     columns: ["No.", "Kode Barang", "Nama Barang", "Qty", "Harga", "Total"],
     pagination: {
@@ -87,8 +93,8 @@ const InvoiceForm = () => {
 
   return (
     <>
-      <div style={{ overflow: "hidden", height: 0   }}>
-        <Invoice ref={invoiceToPrint} state={state}/>
+      <div style={{ overflow: "hidden", height: 0 }}>
+        <Invoice ref={invoiceToPrint} state={state} />
       </div>
       <Row justify="center">
         <h2>Info Faktur</h2>
@@ -115,8 +121,19 @@ const InvoiceForm = () => {
                       },
                     ]}
                     label="Nama Perusahaan"
+                    initialValue={state.buyerInfo.name}
                   >
-                    <Input />
+                    <Input
+                      onBlur={(e) =>
+                        dispatch({
+                          type: "UPDATE_FORM_INPUT_VALUE",
+                          payload: {
+                            name: "name",
+                            value: e.target.value,
+                          },
+                        })
+                      }
+                    />
                   </Form.Item>
                 </Col>
                 <Col span="11">
@@ -129,8 +146,19 @@ const InvoiceForm = () => {
                         message: "Nomor faktur jual tidak boleh kosong",
                       },
                     ]}
+                    initialValue={state.buyerInfo.number}
                   >
-                    <Input />
+                    <Input
+                      onBlur={(e) =>
+                        dispatch({
+                          type: "UPDATE_FORM_INPUT_VALUE",
+                          payload: {
+                            name: "number",
+                            value: e.target.value,
+                          },
+                        })
+                      }
+                    />
                   </Form.Item>
                 </Col>
               </Row>
@@ -145,9 +173,20 @@ const InvoiceForm = () => {
                         message: "Alamat perusahaan tidak boleh kosong",
                       },
                     ]}
+                    initialValue={state.buyerInfo.address}
                     {...fullLayout}
                   >
-                    <Input />
+                    <Input
+                      onBlur={(e) =>
+                        dispatch({
+                          type: "UPDATE_FORM_INPUT_VALUE",
+                          payload: {
+                            name: "address",
+                            value: e.target.value,
+                          },
+                        })
+                      }
+                    />
                   </Form.Item>
                 </Col>
               </Row>
@@ -162,9 +201,20 @@ const InvoiceForm = () => {
                         message: "Tanggal tidak boleh kosong",
                       },
                     ]}
-                    initialValue={moment(new Date())}
+                    initialValue={moment(state.buyerInfo.date, "DD-MM-YYYY")}
                   >
-                    <DatePicker format="DD-MM-YYYY" />
+                    <DatePicker
+                      format="DD-MM-YYYY"
+                      onBlur={(e) =>
+                        dispatch({
+                          type: "UPDATE_FORM_INPUT_VALUE",
+                          payload: {
+                            name: "date",
+                            value: e.target.value,
+                          },
+                        })
+                      }
+                    />
                   </Form.Item>
                 </Col>
                 <Col span="7">
@@ -177,9 +227,20 @@ const InvoiceForm = () => {
                         message: "Jatuh tempo tidak boleh kosong",
                       },
                     ]}
-                    initialValue={moment(new Date()).add(30, "days")}
+                    initialValue={moment(state.buyerInfo.due, "DD-MM-YYYY")}
                   >
-                    <DatePicker format="DD-MM-YYYY" />
+                    <DatePicker
+                      format="DD-MM-YYYY"
+                      onBlur={(e) =>
+                        dispatch({
+                          type: "UPDATE_FORM_INPUT_VALUE",
+                          payload: {
+                            name: "due",
+                            value: e.target.value,
+                          },
+                        })
+                      }
+                    />
                   </Form.Item>
                 </Col>
                 <Col span="9">
@@ -192,16 +253,42 @@ const InvoiceForm = () => {
                         message: "Kota tidak boleh kosong",
                       },
                     ]}
+                    initialValue={state.buyerInfo.city}
                     wrapperCol={{ span: "19" }}
                   >
-                    <Input />
+                    <Input
+                      onBlur={(e) =>
+                        dispatch({
+                          type: "UPDATE_FORM_INPUT_VALUE",
+                          payload: {
+                            name: "city",
+                            value: e.target.value,
+                          },
+                        })
+                      }
+                    />
                   </Form.Item>
                 </Col>
               </Row>
               <Row>
                 <Col span="23" offset="1">
-                  <Form.Item label="Keterangan" {...fullLayout} name="note">
-                    <Input.TextArea />
+                  <Form.Item
+                    label="Keterangan"
+                    {...fullLayout}
+                    name="note"
+                    initialValue={state.buyerInfo.note}
+                  >
+                    <Input.TextArea
+                      onBlur={(e) =>
+                        dispatch({
+                          type: "UPDATE_FORM_INPUT_VALUE",
+                          payload: {
+                            name: "note",
+                            value: e.target.value,
+                          },
+                        })
+                      }
+                    />
                   </Form.Item>
                 </Col>
               </Row>
@@ -251,12 +338,16 @@ const EditableCell = ({
           style={{ marginBottom: 0 }}
         >
           <NumberFormat
-            {...(dataIndex === "price" ? {
-              format:numberWithCommas,
-              isAllowed:priceFormat} 
-            : {
-              isAllowed:qtyFormat
-            })}
+            {...(dataIndex === "price"
+              ? {
+                  format: numberWithCommas,
+                  isAllowed: priceFormat,
+                  allowNegative: true,
+                }
+              : {
+                  isAllowed: qtyFormat,
+                  allowNegative: false,
+                })}
             value={state.data[index][dataIndex]}
             displayType="input"
             customInput={Input}
@@ -264,7 +355,7 @@ const EditableCell = ({
             onValueChange={(values) => {
               const { value } = values;
               dispatch({
-                type: "UPDATE_INPUT_VALUE",
+                type: "UPDATE_TABLE_INPUT_VALUE",
                 payload: {
                   val: parseInt(value),
                   index: index,
@@ -292,7 +383,7 @@ const EditableCell = ({
           <Input
             onBlur={(e) =>
               dispatch({
-                type: "UPDATE_INPUT_VALUE",
+                type: "UPDATE_TABLE_INPUT_VALUE",
                 payload: {
                   val: e.target.value,
                   index: index,
@@ -339,22 +430,31 @@ const ItemsTable = (props) => {
       dataIndex: "qty",
       editable: true,
       width: "10%",
+      align: "right",
     },
     {
       title: props.state.columns[4],
       dataIndex: "price",
       editable: true,
       width: "15%",
+      align: "right",
     },
     {
       title: props.state.columns[5],
       dataIndex: "total",
+      align: "right",
       render: (text, _, index) => {
         let idx =
           index +
           (props.state.pagination.current - 1) *
             props.state.pagination.pageSize;
-        return <NumberFormat format={numberWithCommas} displayType="text" value={props.state.data[idx].total}/>;
+        return (
+          <NumberFormat
+            format={numberWithCommas}
+            displayType="text"
+            value={props.state.data[idx].qty * props.state.data[idx].price}
+          />
+        );
       },
     },
     {
@@ -389,8 +489,6 @@ const ItemsTable = (props) => {
   });
 
   const addItem = () => {
-    console.log(props.state.data);
-    console.log(props.form.getFieldsValue());
     const toBeReset = getFieldsOnTable(props.form.getFieldsValue());
 
     const newRow = {
@@ -399,7 +497,6 @@ const ItemsTable = (props) => {
       name: "",
       qty: 1,
       price: 0,
-      total: 0,
     };
 
     // validate before adding new item creates a new page
@@ -449,6 +546,13 @@ const ItemsTable = (props) => {
             pagination={props.state.pagination}
             onChange={(pagination) => changePage(pagination)}
             rowKey="id"
+            footer={() => {
+              return (
+                <div style={{ textAlign: "right", fontWeight: "bold" }}>
+                  Grand total: <NumberFormat displayType="text" format={numberWithCommas} value={props.state.grandTotal}/>
+                </div>
+              );
+            }}
           />
         </Col>
       </Row>
