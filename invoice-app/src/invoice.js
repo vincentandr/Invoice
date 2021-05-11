@@ -1,7 +1,7 @@
 import React from "react";
 import { numberWithCommas } from "./util.js";
 import NumberFormat from "react-number-format";
-
+import logo from "./assets/logo.png";
 
 const invoiceStyle = `
   @media print {  
@@ -25,6 +25,7 @@ const invoiceStyle = `
 
     header {
       display:flex;
+      align-items:flex-end;
     }
 
     #title{
@@ -33,6 +34,23 @@ const invoiceStyle = `
 
     #invoiceNo{
       margin-left: auto;
+    }
+    
+    .info span{
+      display: inline-block;
+      position: relative;
+      width: 60%;
+      padding-right: 1em;
+    }
+
+    .info span::after{
+      position: absolute;
+      content: ":"
+      right: 1mm;
+    }
+
+    #sellerCompany{
+      margin-right: auto;
     }
 
     #buyerCompany{
@@ -92,7 +110,7 @@ const TopPart = ({number}) => {
 const SellerCompany = () => {
   return (
     <div id="sellerCompany">
-      <h1>Logo</h1>
+      <img src={logo} alt="logo" />
       <h3>031 5460169</h3>
     </div>
   );
@@ -109,10 +127,26 @@ const BuyerCompany = (props) => {
   );
 };
 
+const Dates = (props) => {
+  return (
+    <div class="info">
+      <h3>
+        <span>Tanggal dokumen</span>
+        {props.date}
+      </h3>
+      <h3>
+        <span>Jatuh tempo</span>
+        {props.due} (30 hari)
+      </h3>
+    </div>
+  );
+};
+
 const Header = (props) => {
   return (
     <header>
       <SellerCompany />
+      <Dates {...props} />
       <BuyerCompany {...props} />
     </header>
   );
