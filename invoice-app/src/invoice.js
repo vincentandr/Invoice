@@ -71,103 +71,23 @@ class Invoice extends React.PureComponent {
   render() {
     return (
       <div id="invoice">
-        <div id="top">
-          <h1 id="title">FAKTUR PENJUALAN</h1>
-          <h3 id="invoiceNo">
-            No. faktur: {this.props.state.buyerInfo.number}
-          </h3>
-        </div>
-        <header>
-          <SellerCompany />
-          <BuyerCompany {...this.props.state.buyerInfo} />
-        </header>
-        <table>
-          <colgroup>
-            <col span="1" style={{ width: "5%" }} />
-            <col span="1" style={{ width: "15%" }} />
-            <col span="1" style={{ width: "35%" }} />
-            <col span="1" style={{ width: "10%" }} />
-            <col span="1" style={{ width: "10%" }} />
-            <col span="1" style={{ width: "10%" }} />
-          </colgroup>
-          <thead>
-            <tr>
-              {this.props.state.columns.map((column, index) => (
-                <th
-                  key={index}
-                  {...((column.toLowerCase() === "harga" ||
-                    column.toLowerCase() === "total" ||
-                    column.toLowerCase() === "qty") && {
-                    className: "numeric",
-                  })}
-                >
-                  {column}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {this.props.state.data.map((item, outerIndex) => {
-              return (
-                <tr key={outerIndex}>
-                  {Object.keys(item).map((column, innerIndex) => (
-                    <td
-                      key={innerIndex}
-                      {...((column === "price" || column === "qty") && {
-                        className: "numeric",
-                      })}
-                    >
-                      {column === "price" ? (
-                        <NumberFormat
-                          format={numberWithCommas}
-                          displayType="text"
-                          value={item[column]}
-                        />
-                      ) : (
-                        item[column]
-                      )}
-                    </td>
-                  ))}
-                  <td className="numeric">
-                    <NumberFormat
-                      format={numberWithCommas}
-                      displayType="text"
-                      value={item.qty * item.price}
-                    />
-                  </td>
-                </tr>
-              );
-            })}
-            <tr className="numeric" id="grandTotal">
-              <td colSpan="5">Grand total:</td>
-              <td>{numberWithCommas(this.props.state.grandTotal)}</td>
-            </tr>
-            <tr>
-              <td colSpan="6">
-                <div id="note">
-                  Keterangan: Lorem ipsum dolor sit amet consectetur adipisicing
-                  elit. Quae consequatur illo nostrum facilis iusto qui debitis
-                  perferendis cum iure corrupti. Reprehenderit eius repudiandae
-                  fugit nisi incidunt eligendi tempore, explicabo mollitia.
-                  Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Magni
-                  eveniet labore temporibus illum, ullam modi corporis facilis
-                  asperiores quasi itaque soluta amet? Tempore qui, iusto rem
-                  eveniet libero dolor fuga. Quae atque, reiciendis iste
-                  consectetur tenetur ipsum, nobis omnis rerum illo quos dolorem
-                  obcaecati similique nam magni tempore ratione esse quam
-                  laborum?
-                  {this.props.state.buyerInfo.note}
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <footer></footer>
+        <TopPart number={this.props.state.buyerInfo.number} />
+        <Header {...this.props.state.buyerInfo} />
+        <TableItems {...this.props} />
+        <Footer />
       </div>
     );
   }
 }
+
+const TopPart = ({number}) => {
+  return (
+    <div id="top">
+      <h1 id="title">FAKTUR PENJUALAN</h1>
+      <h3 id="invoiceNo">No. faktur: {number}</h3>
+    </div>
+  );
+};
 
 const SellerCompany = () => {
   return (
@@ -188,5 +108,105 @@ const BuyerCompany = (props) => {
     </div>
   );
 };
+
+const Header = (props) => {
+  return (
+    <header>
+      <SellerCompany />
+      <BuyerCompany {...props} />
+    </header>
+  );
+};;
+
+const TableItems = (props) => {
+  return (
+  <table>
+    <colgroup>
+      <col span="1" style={{ width: "5%" }} />
+      <col span="1" style={{ width: "15%" }} />
+      <col span="1" style={{ width: "35%" }} />
+      <col span="1" style={{ width: "10%" }} />
+      <col span="1" style={{ width: "10%" }} />
+      <col span="1" style={{ width: "10%" }} />
+    </colgroup>
+    <thead>
+      <tr>
+        {props.state.columns.map((column, index) => (
+          <th
+            key={index}
+            {...((column.toLowerCase() === "harga" ||
+              column.toLowerCase() === "total" ||
+              column.toLowerCase() === "qty") && {
+              className: "numeric",
+            })}
+          >
+            {column}
+          </th>
+        ))}
+      </tr>
+    </thead>
+    <tbody>
+      {props.state.data.map((item, outerIndex) => {
+        return (
+          <tr key={outerIndex}>
+            {Object.keys(item).map((column, innerIndex) => (
+              <td
+                key={innerIndex}
+                {...((column === "price" || column === "qty") && {
+                  className: "numeric",
+                })}
+              >
+                {column === "price" ? (
+                  <NumberFormat
+                    format={numberWithCommas}
+                    displayType="text"
+                    value={item[column]}
+                  />
+                ) : (
+                  item[column]
+                )}
+              </td>
+            ))}
+            <td className="numeric">
+              <NumberFormat
+                format={numberWithCommas}
+                displayType="text"
+                value={item.qty * item.price}
+              />
+            </td>
+          </tr>
+        );
+      })}
+      <tr className="numeric" id="grandTotal">
+        <td colSpan="5">Grand total:</td>
+        <td>{numberWithCommas(props.state.grandTotal)}</td>
+      </tr>
+      <tr>
+        <td colSpan="6">
+          <div id="note">
+            Keterangan: Lorem ipsum dolor sit amet consectetur adipisicing elit.
+            Quae consequatur illo nostrum facilis iusto qui debitis perferendis
+            cum iure corrupti. Reprehenderit eius repudiandae fugit nisi
+            incidunt eligendi tempore, explicabo mollitia. Lorem ipsum dolor sit
+            amet consectetur, adipisicing elit. Lorem ipsum dolor sit amet
+            consectetur adipisicing elit. Magni eveniet labore temporibus illum,
+            ullam modi corporis facilis asperiores quasi itaque soluta amet?
+            Tempore qui, iusto rem eveniet libero dolor fuga. Quae atque,
+            reiciendis iste consectetur tenetur ipsum, nobis omnis rerum illo
+            quos dolorem obcaecati similique nam magni tempore ratione esse quam
+            laborum?
+            {props.state.buyerInfo.note}
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>);
+};
+
+const Footer = () => {
+  return <foother>
+    
+  </foother>
+}
 
 export { Invoice, invoiceStyle };

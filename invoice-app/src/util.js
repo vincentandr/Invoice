@@ -19,7 +19,7 @@ const getFieldsOnTable = (fields) => {
 };
 
 const calculateGrandTotal = (data) => {
-  return data.reduce((sum, item2) => sum + item2.qty * item2.price, 0);
+  return data.reduce((sum, item) => sum + item.qty * item.price, 0);
 };
 
 export {
