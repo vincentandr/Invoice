@@ -204,9 +204,9 @@ const TableItems = (props) => {
 };
 
 const Footer = () => {
-  return <foother>
+  return <footer>
     
-  </foother>
+  </footer>
 }
 
 export { Invoice, invoiceStyle };
