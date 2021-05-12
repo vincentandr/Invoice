@@ -557,7 +557,7 @@ const ItemsTable = (props) => {
                         displayType="text"
                         format={numberWithCommas}
                         value={
-                          props.state.buyerInfo.grandTotal -
+                          props.state.buyerInfo.grandTotal +
                           props.state.buyerInfo.discount
                         }
                       />
@@ -580,7 +580,7 @@ const ItemsTable = (props) => {
                             type: "UPDATE_FORM_INPUT_VALUE",
                             payload: {
                               name: "discount",
-                              value: value,
+                              value: parseInt(value),
                             },
                           });
                         }}

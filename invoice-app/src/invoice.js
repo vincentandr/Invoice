@@ -1,7 +1,7 @@
 import React from "react";
 import { numberWithCommas } from "./util.js";
 import NumberFormat from "react-number-format";
-import logo from "./assets/logo.png";
+import logo from "./assets/logo_with_text.png";
 
 const invoiceStyle = `
   @media print {  
@@ -13,11 +13,17 @@ const invoiceStyle = `
       text-align:right;
     }
 
-    #invoice{
+    .page-break{
+      page-break-before: always;
+      page-break-after: always;
+      display: block;
+    }
+
+    .invoice{
       font-size: 0.7em;
     }
     
-    #invoiceNo{
+    #pageNo{
       padding-left: 10%;
     }
 
@@ -31,15 +37,15 @@ const invoiceStyle = `
       
     }
     
-    .date {
+    .info {
       display: table;
     }
 
-    .date h3 {
+    .info h3 {
       display: table-row;
     }
 
-    .date span{
+    .info span{
       display: table-cell;
       padding-right: 2mm;
       padding-top: 1.5mm;
@@ -120,17 +126,22 @@ const invoiceStyle = `
 class Invoice extends React.PureComponent {
   render() {
     return (
-      <div id="invoice">
-        <TopPart number={this.props.state.buyerInfo.number} />
-        <Header {...this.props.state.buyerInfo} />
-        <TableItems {...this.props} />
-        <Footer {...this.props.state} />
-      </div>
+      <>
+          <div className="invoice page-break">
+            <TopPart />
+            <Header {...this.props.state.buyerInfo} />
+            <TableItems {...this.props} />
+            <Footer {...this.props.state} />
+          </div>
+          <div className="invoice">
+            testtt
+          </div>
+      </>
     );
   }
 }
 
-const TopPart = ({number}) => {
+const TopPart = () => {
   return (
     <div id="top">
       <div className="column">
@@ -139,8 +150,8 @@ const TopPart = ({number}) => {
       <h1 id="title" className="column">
         FAKTUR PENJUALAN
       </h1>
-      <h3 id="invoiceNo" className="column">
-        No. faktur: {number}
+      <h3 id="pageNo" className="column">
+        Page 1 of 1
       </h3>
     </div>
   );
@@ -168,7 +179,10 @@ const BuyerCompany = (props) => {
 const Dates = (props) => {
   return (
     <div className="column">
-      <div className="date">
+      <div className="info">
+        <h3>
+          <span>No. faktur</span>: {props.number}
+        </h3>
         <h3>
           <span>Tanggal dokumen</span>: {props.date}
         </h3>
@@ -253,9 +267,11 @@ const TableItems = (props) => {
       <tfoot>
         <tr className="numeric" id="subtotal">
           <td colSpan="5">Subtotal</td>
-          <td>{
-          numberWithCommas(props.state.buyerInfo.grandTotal - props.state.buyerInfo.discount)
-          }</td>
+          <td>
+            {numberWithCommas(
+              props.state.buyerInfo.grandTotal + props.state.buyerInfo.discount
+            )}
+          </td>
         </tr>
         <tr className="numeric" id="discount">
           <td colSpan="5">Discount</td>
