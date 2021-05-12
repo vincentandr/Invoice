@@ -82,6 +82,26 @@ const invoiceStyle = `
       h3 {
         line-height:1em;
       }
+
+      footer {
+        display: flex;
+        position:absolute;
+        bottom: 0;
+        left: 30%;
+        text-align:center;
+      }
+
+      .sign:nth-child(2){
+        margin-left: 5em;
+      }
+      
+      .sign:last-child{
+        margin-left: 5em;
+      }
+
+      .sign h3{
+        padding-bottom: 3em;
+      }
     }
   `;
 
@@ -111,7 +131,7 @@ const SellerCompany = () => {
   return (
     <div id="sellerCompany">
       <img src={logo} alt="logo" />
-      <h3>031 5460169</h3>
+      <h3>UD. Maju Jaya Diesel</h3>
     </div>
   );
 };
@@ -129,7 +149,7 @@ const BuyerCompany = (props) => {
 
 const Dates = (props) => {
   return (
-    <div class="info">
+    <div className="info">
       <h3>
         <span>Tanggal dokumen</span>
         {props.date}
@@ -238,9 +258,22 @@ const TableItems = (props) => {
 };
 
 const Footer = () => {
-  return <footer>
-    
-  </footer>
-}
+  return (
+    <footer>
+      <SignArea person="Penerima" />
+      <SignArea person="Penjual"  />
+      <SignArea person="Checklist" />
+    </footer>
+  );
+};
+
+const SignArea = ({ person, className }) => {
+  return (
+    <div className="sign">
+      <h3>{person}</h3>
+      <span>________________</span>
+    </div>
+  );
+};
 
 export { Invoice, invoiceStyle };
