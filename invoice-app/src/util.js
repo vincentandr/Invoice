@@ -18,8 +18,8 @@ const getFieldsOnTable = (fields) => {
   return keys.filter((key) => regex.test(key));
 };
 
-const calculateGrandTotal = (data) => {
-  return data.reduce((sum, item) => sum + item.qty * item.price, 0);
+const calculateGrandTotal = (data, discount) => {
+  return data.reduce((sum, item) => sum + item.qty * item.price, 0) - discount;
 };
 
 export {

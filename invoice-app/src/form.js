@@ -55,7 +55,6 @@ const InvoiceForm = () => {
         price: 0,
       },
     ],
-    grandTotal:   0,
     buyerInfo: {
       name: "",
       number: "",
@@ -64,6 +63,8 @@ const InvoiceForm = () => {
       due: moment(new Date()).add(30, "days").format("DD-MM-YYYY"),
       city: "",
       note: "",
+      discount: 0,
+      grandTotal: 0,
     },
     columns: ["No.", "Kode Barang", "Nama Barang", "Qty", "Harga", "Total"],
     pagination: {
@@ -351,7 +352,7 @@ const EditableCell = ({
             value={state.data[index][dataIndex]}
             displayType="input"
             customInput={Input}
-            style={{ width: "100%" }}
+            style={{ width: "100%", textAlign: "end" }}
             onValueChange={(values) => {
               const { value } = values;
               dispatch({
@@ -548,8 +549,54 @@ const ItemsTable = (props) => {
             rowKey="id"
             footer={() => {
               return (
-                <div style={{ textAlign: "right", fontWeight: "bold" }}>
-                  Grand total: <NumberFormat displayType="text" format={numberWithCommas} value={props.state.grandTotal}/>
+                <div style={{ fontWeight: "bold" }}>
+                  <Row justify="end">
+                    <Col pull="1">Subtotal</Col>
+                    <Col span="3" style={{ textAlign: "end" }}>
+                      <NumberFormat
+                        displayType="text"
+                        format={numberWithCommas}
+                        value={
+                          props.state.buyerInfo.grandTotal -
+                          props.state.buyerInfo.discount
+                        }
+                      />
+                    </Col>
+                  </Row>
+                  <Row justify="end">
+                    <Col pull="1">Discount</Col>
+                    <Col span="3">
+                      <NumberFormat
+                        customInput={Input}
+                        displayType="input"
+                        format={numberWithCommas}
+                        allowNegative={false}
+                        isAllowed={priceFormat}
+                        value={props.state.buyerInfo.discount}
+                        style={{ textAlign: "end" }}
+                        onValueChange={(values) => {
+                          const { value } = values;
+                          props.dispatch({
+                            type: "UPDATE_FORM_INPUT_VALUE",
+                            payload: {
+                              name: "discount",
+                              value: value,
+                            },
+                          });
+                        }}
+                      />
+                    </Col>
+                  </Row>
+                  <Row justify="end">
+                    <Col pull="1">Grand Total</Col>
+                    <Col span="3" style={{ textAlign: "end" }}>
+                      <NumberFormat
+                        displayType="text"
+                        format={numberWithCommas}
+                        value={props.state.buyerInfo.grandTotal}
+                      />
+                    </Col>
+                  </Row>
                 </div>
               );
             }}

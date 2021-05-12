@@ -27,7 +27,7 @@ const reducer = (state, action) => {
 
       let newItems = dataCopy.filter((item) => item.id !== id);
 
-      let grandTotal = calculateGrandTotal(newItems);
+      let grandTotal = calculateGrandTotal(newItems, state.buyerInfo.discount);
 
       let current = state.pagination.current;
 
@@ -38,7 +38,7 @@ const reducer = (state, action) => {
         ...state,
         data: newItems,
         pagination: { ...state.pagination, current: current },
-        grandTotal: grandTotal,
+        buyerInfo: { ...state.buyerInfo, grandTotal: grandTotal },
       };
     }
     case "REMOVE_ALL": {
@@ -53,7 +53,7 @@ const reducer = (state, action) => {
             price: 0,
           },
         ],
-        grandTotal:   0,
+        buyerInfo: { ...state.buyerInfo, grandTotal: 0, discount: 0 },
         count: 1,
         pagination: {
           ...state.pagination,
@@ -68,6 +68,13 @@ const reducer = (state, action) => {
       let dataCopy = { ...state.buyerInfo };
 
       dataCopy[name] = val;
+
+      if (name === "discount") {
+        var grandTotal = calculateGrandTotal(state.data, dataCopy.discount);
+        dataCopy.grandTotal = grandTotal;
+      }
+
+      console.log(dataCopy.discount);
 
       return {
         ...state,
@@ -87,12 +94,12 @@ const reducer = (state, action) => {
 
       dataCopy[index] = item;
 
-      let grandTotal = calculateGrandTotal(dataCopy);
+      let grandTotal = calculateGrandTotal(dataCopy, state.buyerInfo.discount);
 
       return {
         ...state,
         data: [...dataCopy],
-        grandTotal: grandTotal,
+        buyerInfo: { ...state.buyerInfo, grandTotal: grandTotal },
       };
     }
     case "TOGGLE_MODAL":
