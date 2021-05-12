@@ -508,7 +508,7 @@ const ItemsTable = (props) => {
           props.dispatch({ type: "ADD_ITEM", payload: newRow });
         })
         .catch((err) => {
-          console.log("error");
+          console.log("form values are missing");
         });
     } else {
       props.dispatch({ type: "ADD_ITEM", payload: newRow });

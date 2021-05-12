@@ -125,23 +125,35 @@ const invoiceStyle = `
 
 class Invoice extends React.PureComponent {
   render() {
-    return (
-      <>
-          <div className="invoice page-break">
-            <TopPart />
-            <Header {...this.props.state.buyerInfo} />
-            <TableItems {...this.props} />
-            <Footer {...this.props.state} />
-          </div>
-          <div className="invoice">
-            testtt
-          </div>
-      </>
-    );
+    const sizePerPage = 10; // 10 items per print page
+
+    let dataLength = this.props.state.data.length; // items count
+    let pageCount = Math.ceil(dataLength / sizePerPage); // page count
+
+    let invoicePages = [];
+
+    for (var i = 0; i < pageCount; i++) {
+      let startIndex = i * sizePerPage; // start index for item slicing, if sizeperpage = 10 then startindex 0, 10, 20, ...
+      let endIndex = startIndex + sizePerPage; // end index for item slicing
+      let lastPageItems = dataLength % sizePerPage; // item count for last page, maybe lower than sizeperpage
+      if(i === pageCount - 1 && lastPageItems !== 0){ // if last page and last page item count != sizeperpage
+        endIndex = startIndex + lastPageItems;
+      }
+      invoicePages.push(
+        <div className="invoice page-break" key={`page${i   +   1}`}>
+          <TopPart page={i+1} pageCount={pageCount}/>
+          <Header {...this.props.state.buyerInfo} />
+          <TableItems {...this.props} start={startIndex} end={endIndex} isLastPage={i === pageCount - 1}/>
+          <Footer {...this.props.state} />
+        </div>
+      );
+    }
+
+    return <div>{invoicePages}</div>;
   }
 }
 
-const TopPart = () => {
+const TopPart = (props) => {
   return (
     <div id="top">
       <div className="column">
@@ -151,7 +163,7 @@ const TopPart = () => {
         FAKTUR PENJUALAN
       </h1>
       <h3 id="pageNo" className="column">
-        Page 1 of 1
+        Page {props.page} of {props.pageCount}
       </h3>
     </div>
   );
@@ -205,6 +217,10 @@ const Header = (props) => {
 };;
 
 const TableItems = (props) => {
+  let startIndex = props.start;
+  let endIndex = props.end;
+  let subset = props.state.data.slice(startIndex, endIndex);
+
   return (
     <table>
       <colgroup>
@@ -232,7 +248,7 @@ const TableItems = (props) => {
         </tr>
       </thead>
       <tbody>
-        {props.state.data.map((item, outerIndex) => {
+        {subset.map((item, outerIndex) => {
           return (
             <tr key={outerIndex} className="items">
               {Object.keys(item).map((column, innerIndex) => (
@@ -264,7 +280,7 @@ const TableItems = (props) => {
           );
         })}
       </tbody>
-      <tfoot>
+      {props.isLastPage && <tfoot >
         <tr className="numeric" id="subtotal">
           <td colSpan="5">Subtotal</td>
           <td>
@@ -289,7 +305,7 @@ const TableItems = (props) => {
             </div>
           </td>
         </tr>
-      </tfoot>
+      </tfoot>}
     </table>
   );
 };

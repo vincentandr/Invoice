@@ -74,8 +74,6 @@ const reducer = (state, action) => {
         dataCopy.grandTotal = grandTotal;
       }
 
-      console.log(dataCopy.discount);
-
       return {
         ...state,
         buyerInfo: { ...dataCopy },
