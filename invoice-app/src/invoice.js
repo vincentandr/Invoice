@@ -103,7 +103,7 @@ const invoiceStyle = `
 
       footer {
         display: flex;
-        position:absolute;
+        position:fixed;
         bottom: 0;
         left: 30%;
         text-align:center;
@@ -125,7 +125,7 @@ const invoiceStyle = `
 
 class Invoice extends React.PureComponent {
   render() {
-    const sizePerPage = 10; // 10 items per print page
+    const sizePerPage = 10; // items per page
 
     let dataLength = this.props.state.data.length; // items count
     let pageCount = Math.ceil(dataLength / sizePerPage); // page count
@@ -251,24 +251,28 @@ const TableItems = (props) => {
         {subset.map((item, outerIndex) => {
           return (
             <tr key={outerIndex} className="items">
-              {Object.keys(item).map((column, innerIndex) => (
-                <td
-                  key={innerIndex}
-                  {...((column === "price" || column === "qty") && {
-                    className: "numeric",
-                  })}
-                >
-                  {column === "price" ? (
-                    <NumberFormat
-                      format={numberWithCommas}
-                      displayType="text"
-                      value={item[column]}
-                    />
-                  ) : (
-                    item[column]
-                  )}
-                </td>
-              ))}
+              {Object.keys(item).map((column, innerIndex) => {
+                if  (column !== "count")
+                    return  (
+                  <td
+                    key={innerIndex}
+                    {...((column === "price" || column === "qty") && {
+                      className: "numeric",
+                    })}
+                  >
+                    {column === "price" ? (
+                      <NumberFormat
+                        format={numberWithCommas}
+                        displayType="text"
+                        value={item[column]}
+                      />
+                    ) : (
+                      item[column]
+                    )}
+                  </td>
+                );
+              ;
+              })}
               <td className="numeric">
                 <NumberFormat
                   format={numberWithCommas}

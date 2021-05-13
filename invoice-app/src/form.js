@@ -49,6 +49,7 @@ const InvoiceForm = () => {
     data: [
       {
         id: 1,
+        count: 1,
         code: "",
         name: "",
         qty: 1,
@@ -71,7 +72,6 @@ const InvoiceForm = () => {
       current: 1,
       pageSize: 5,
     },
-    count: 1,
     isShowModal: false,
   };
 
@@ -493,7 +493,8 @@ const ItemsTable = (props) => {
     const toBeReset = getFieldsOnTable(props.form.getFieldsValue());
 
     const newRow = {
-      id: props.state.count + 1,
+      id: props.state.data.length + 1,
+      count: props.state.data[props.state.data.length - 1].count + 1,
       code: "",
       name: "",
       qty: 1,
@@ -546,7 +547,7 @@ const ItemsTable = (props) => {
             columns={tableColumns}
             pagination={props.state.pagination}
             onChange={(pagination) => changePage(pagination)}
-            rowKey="id"
+            rowKey="count"
             footer={() => {
               return (
                 <div style={{ fontWeight: "bold" }}>

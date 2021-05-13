@@ -5,18 +5,15 @@ const reducer = (state, action) => {
     case "ADD_ITEM": {
       let newItem = action.payload;
 
-      let newCount = state.count + 1;
-
-      let dataLength = [...state.data].length + 1;
+      let dataLength = [...state.data].length;
 
       let pageSize = state.pagination.pageSize;
 
-      let current = Math.ceil(dataLength / pageSize);
+      let current = Math.ceil((dataLength + 1) / pageSize);
 
       return {
         ...state,
         data: [...state.data, newItem],
-        count: newCount,
         pagination: { ...state.pagination, current: current },
       };
     }
@@ -25,14 +22,21 @@ const reducer = (state, action) => {
 
       let dataCopy = [...state.data];
 
+      let pageCount = Math.ceil(dataCopy.length / state.pagination.pageSize);
+
       let newItems = dataCopy.filter((item) => item.id !== id);
+
+      // reorder id after removing
+      for (var i = id - 1; i < newItems.length; i++) {
+        newItems[i].id = newItems[i].id - 1;
+      }
 
       let grandTotal = calculateGrandTotal(newItems, state.buyerInfo.discount);
 
       let current = state.pagination.current;
-
-      // redirect to previous page if the deleted item is the first and only item of current page
-      if (newItems.length % state.pagination.pageSize === 0)
+      
+      // redirect to previous page if the deleted item is the first and only item of last page
+      if (newItems.length % state.pagination.pageSize === 0 && pageCount === current)
         current = current - 1;
       return {
         ...state,
@@ -47,6 +51,7 @@ const reducer = (state, action) => {
         data: [
           {
             id: 1,
+            count: 1,
             code: "",
             name: "",
             qty: 1,
@@ -54,7 +59,6 @@ const reducer = (state, action) => {
           },
         ],
         buyerInfo: { ...state.buyerInfo, grandTotal: 0, discount: 0 },
-        count: 1,
         pagination: {
           ...state.pagination,
           current: 1,
