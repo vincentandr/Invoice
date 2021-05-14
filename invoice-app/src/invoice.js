@@ -4,6 +4,9 @@ import NumberFormat from "react-number-format";
 import logo from "./assets/logo_with_text.png";
 
 const invoiceStyle = `
+  html *{
+    font-family: "Trebuchet MS";
+  }
   @media print {  
       @page { 
       size: 21.59cm 13.97cm;
