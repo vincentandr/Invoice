@@ -178,6 +178,7 @@ const InvoiceForm = () => {
                     {...fullLayout}
                   >
                     <Input
+                      maxLength={80}
                       onBlur={(e) =>
                         dispatch({
                           type: "UPDATE_FORM_INPUT_VALUE",
