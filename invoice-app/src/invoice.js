@@ -9,24 +9,26 @@ const invoiceStyle = `
       size: 21.59cm 13.97cm;
     } 
 
+    html, body{
+      width:100%;
+      height: 100%;
+    }
+
     .numeric{
       text-align:right;
     }
 
-    .page-break{
-      page-break-before: always;
-      page-break-after: always;
-      display: block;
-    }
-
     .invoice{
       font-size: 0.7em;
-    }
-    
-    #pageNo{
-      padding-left: 10%;
+      height:100%;
     }
 
+    header, footer{
+      position:fixed;
+      width:100%;
+      display:block;
+    }
+    
     #buyerCompany{
       padding-left: 10%;
     }
@@ -53,18 +55,16 @@ const invoiceStyle = `
 
      table{
         width: 100%;
-        height:25em;
         font-size: 1em;
         border-top: solid 1px black;
+        position: absolute;
+        top:25%;
+        max-height:50px;
+        page-break-inside:auto;
       }
 
-      table tr{
+      table tbody tr{
         height:1em;
-      }
-
-      table tr:last-child{
-        height:auto;
-        border-bottom: solid 1px black;
       }
 
       table td, table th{
@@ -88,7 +88,11 @@ const invoiceStyle = `
         border-bottom: none;
       }
 
-       table #grandTotal td{
+      table #subtotal{
+        border-top: solid 1px black;
+      }
+
+      table #grandTotal{
          border-bottom: solid 1px black;
        }
 
@@ -97,13 +101,18 @@ const invoiceStyle = `
         overflow: hidden;
       }
 
+      table tfoot{
+        display:table-row-group;
+        page-break-after: avoid;
+        page-break-inside: avoid;     
+      }
+
       h3 {
         line-height:1em;
       }
 
       footer {
         display: flex;
-        position:fixed;
         bottom: 0;
         left: 30%;
         text-align:center;
@@ -125,46 +134,40 @@ const invoiceStyle = `
 
 class Invoice extends React.PureComponent {
   render() {
-    const sizePerPage = 10; // items per page
-
-    let dataLength = this.props.state.data.length; // items count
-    let pageCount = Math.ceil(dataLength / sizePerPage); // page count
-
-    let invoicePages = [];
-
-    for (var i = 0; i < pageCount; i++) {
-      let startIndex = i * sizePerPage; // start index for item slicing, if sizeperpage = 10 then startindex 0, 10, 20, ...
-      let endIndex = startIndex + sizePerPage; // end index for item slicing
-      let lastPageItems = dataLength % sizePerPage; // item count for last page, maybe lower than sizeperpage
-      if(i === pageCount - 1 && lastPageItems !== 0){ // if last page and last page item count != sizeperpage
-        endIndex = startIndex + lastPageItems;
-      }
-      invoicePages.push(
-        <div className="invoice page-break" key={`page${i   +   1}`}>
-          <TopPart page={i+1} pageCount={pageCount}/>
+    return (
+      <div>
+        <div className="invoice">
           <Header {...this.props.state.buyerInfo} />
-          <TableItems {...this.props} start={startIndex} end={endIndex} isLastPage={i === pageCount - 1}/>
+          <TableItems
+            {...this.props}
+          />
           <Footer {...this.props.state} />
         </div>
-      );
-    }
-
-    return <div>{invoicePages}</div>;
+      </div>
+    );
   }
 }
+
+const Header = (props) => {
+  return (
+    <header>
+      <TopPart />
+      <Dates {...props} />
+      <div className="column"></div>
+      <BuyerCompany {...props} />
+    </header>
+  );
+};
 
 const TopPart = (props) => {
   return (
     <div id="top">
       <div className="column">
-        <img src={logo} alt="logo" />
+        {/* <img src={logo} alt="logo" /> */}
       </div>
       <h1 id="title" className="column">
         FAKTUR PENJUALAN
       </h1>
-      <h3 id="pageNo" className="column">
-        Page {props.page} of {props.pageCount}
-      </h3>
     </div>
   );
 };
@@ -206,111 +209,100 @@ const Dates = (props) => {
   );
 };
 
-const Header = (props) => {
-  return (
-    <header>
-      <Dates {...props} />
-      <div className="column"></div>
-      <BuyerCompany {...props} />
-    </header>
-  );
-};;
-
 const TableItems = (props) => {
-  let startIndex = props.start;
-  let endIndex = props.end;
-  let subset = props.state.data.slice(startIndex, endIndex);
-
   return (
-    <table>
-      <colgroup>
-        <col span="1" style={{ width: "5%" }} />
-        <col span="1" style={{ width: "20%" }} />
-        <col span="1" style={{ width: "45%" }} />
-        <col span="1" style={{ width: "5%" }} />
-        <col span="1" style={{ width: "10%" }} />
-        <col span="1" style={{ width: "15%" }} />
-      </colgroup>
-      <thead>
-        <tr>
-          {props.state.columns.map((column, index) => (
-            <th
-              key={index}
-              {...((column.toLowerCase() === "harga" ||
-                column.toLowerCase() === "total" ||
-                column.toLowerCase() === "qty") && {
-                className: "numeric",
-              })}
-            >
-              {column}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {subset.map((item, outerIndex) => {
-          return (
-            <tr key={outerIndex} className="items">
-              {Object.keys(item).map((column, innerIndex) => {
-                if  (column !== "count")
-                    return  (
-                  <td
-                    key={innerIndex}
-                    {...((column === "price" || column === "qty") && {
-                      className: "numeric",
-                    })}
-                  >
-                    {column === "price" ? (
-                      <NumberFormat
-                        format={numberWithCommas}
-                        displayType="text"
-                        value={item[column]}
-                      />
-                    ) : (
-                      item[column]
-                    )}
-                  </td>
-                );
-              ;
-              })}
-              <td className="numeric">
-                <NumberFormat
-                  format={numberWithCommas}
-                  displayType="text"
-                  value={item.qty * item.price}
-                />
-              </td>
-            </tr>
-          );
-        })}
-      </tbody>
-      {props.isLastPage && <tfoot >
-        <tr className="numeric" id="subtotal">
-          <td colSpan="5">Subtotal</td>
-          <td>
-            {numberWithCommas(
-              props.state.buyerInfo.grandTotal + props.state.buyerInfo.discount
-            )}
-          </td>
-        </tr>
-        <tr className="numeric" id="discount">
-          <td colSpan="5">Discount</td>
-          <td>{numberWithCommas(props.state.buyerInfo.discount)}</td>
-        </tr>
-        <tr className="numeric" id="grandTotal">
-          <td colSpan="5">Grand total</td>
-          <td>{numberWithCommas(props.state.buyerInfo.grandTotal)}</td>
-        </tr>
-        <tr>
-          <td colSpan="6">
-            <div id="note">
-              Keterangan:
-              {props.state.buyerInfo.note}
-            </div>
-          </td>
-        </tr>
-      </tfoot>}
-    </table>
+    <div id="table">
+      <table>
+        <colgroup>
+          <col span="1" style={{ width: "5%" }} />
+          <col span="1" style={{ width: "20%" }} />
+          <col span="1" style={{ width: "45%" }} />
+          <col span="1" style={{ width: "5%" }} />
+          <col span="1" style={{ width: "10%" }} />
+          <col span="1" style={{ width: "15%" }} />
+        </colgroup>
+        <thead>
+          <tr>
+            {props.state.columns.map((column, index) => (
+              <th
+                key={index}
+                {...((column.toLowerCase() === "harga" ||
+                  column.toLowerCase() === "total" ||
+                  column.toLowerCase() === "qty") && {
+                  className: "numeric",
+                })}
+              >
+                {column}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {props.state.data.map((item, outerIndex) => {
+            return (
+              <tr key={outerIndex} className="items">
+                {Object.keys(item).map((column, innerIndex) => {
+                  if (column !== "count")
+                    return (
+                      <td
+                        key={innerIndex}
+                        {...((column === "price" || column === "qty") && {
+                          className: "numeric",
+                        })}
+                      >
+                        {column === "price" ? (
+                          <NumberFormat
+                            format={numberWithCommas}
+                            displayType="text"
+                            value={item[column]}
+                          />
+                        ) : (
+                          item[column]
+                        )}
+                      </td>
+                    );
+                  return "";
+                })}
+                <td className="numeric">
+                  <NumberFormat
+                    format={numberWithCommas}
+                    displayType="text"
+                    value={item.qty * item.price}
+                  />
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+        <tfoot>
+          <tr className="numeric" id="subtotal">
+            <td colspan="5">Subtotal</td>
+            <td>
+              {numberWithCommas(
+                props.state.buyerInfo.grandTotal +
+                  props.state.buyerInfo.discount
+              )}
+            </td>
+          </tr>
+          <tr className="numeric" id="discount">
+            <td colspan="5">Discount</td>
+            <td>{numberWithCommas(props.state.buyerInfo.discount)}</td>
+          </tr>
+          <tr className="numeric" id="grandTotal">
+            <td colspan="5">Grand total</td>
+            <td>{numberWithCommas(props.state.buyerInfo.grandTotal)}</td>
+          </tr>
+          <tr>
+            <td colspan="6">
+              <div id="note">
+                Keterangan:
+                {props.state.buyerInfo.note}
+              </div>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
   );
 };
 
