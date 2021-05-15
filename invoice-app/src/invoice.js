@@ -12,162 +12,158 @@ const invoiceStyle = `
       size: 21.59cm 13.97cm;
     } 
 
-    .numeric{
-      text-align:right;
+    #outerTable{
+      width: 100%;
+      font-size:0.7em;
     }
 
-    .page-break{
-      page-break-before: always;
-      page-break-after: always;
-      display: block;
-    }
+    #outerTable thead {display: table-header-group;}
 
-    .invoice{
-      font-size: 0.7em;
-    }
-    
-    #pageNo{
-      padding-left: 10%;
-    }
-
-    #buyerCompany{
-      padding-left: 10%;
+    #outerTable tfoot td {
+      height: 7em;
     }
 
     .column{
       display: inline-block;
       width: 33%;
-      
+      margin-bottom: 1em;
     }
-    
+
+    #buyerCompany{
+      width: 66%;
+      display: inline-block;
+      margin-bottom: 1em;
+    }
+
+    h3 {
+        line-height:1em;
+      }
+
     .info {
       display: table;
     }
-
     .info h3 {
       display: table-row;
     }
-
     .info span{
       display: table-cell;
       padding-right: 2mm;
       padding-top: 1.5mm;
     }
 
-     table{
-        width: 100%;
-        height:25em;
-        font-size: 1em;
-        border-top: solid 1px black;
+    footer {
+      display:flex;
+      position: fixed;
+      bottom: 0;
+      left: 25%;
+      text-align:center;
+    }
+
+    
+      .sign{
+        font-size:0.7em;
+        margin-left: 5em;
+        text-align: center;
+      }
+          
+      .sign h3{
+        padding-bottom: 3em;
       }
 
-      table tr{
-        height:1em;
-      }
+    #innerTable{
+      width:100%;
+      border: solid 1px black;
+      page-break-after: always;
+    }
 
-      table tr:last-child{
-        height:auto;
-        border-bottom: solid 1px black;
-      }
+    #innerTable tr{
+      font-size:0.8em;
+    }
 
-      table td, table th{
+
+    #innerTable th{
+      border-left: solid 1px black;
+      border-right: solid 1px black;
+    }
+
+       #innerTable td{
+         border-bottom: solid 1px black;
         border-left: solid 1px black;
         border-right: solid 1px black;
         padding-left: 1mm;
         padding-right: 1mm;
         vertical-align:text-top; 
       }
-
-      table, table th{
+      #innerTable{
+        border-top: solid 1px black;
         border-bottom: solid 1px black;
       }
 
-      table, table th{
-        border: solid 1px black;
+      #innerTable tbody tr:last-child {
+        border-bottom:1px solid black;
       }
 
-      table #note td, table #subtotal td, table #discount td{
+      #innerTable #note td,{
         border-top: none;
         border-bottom: none;
       }
 
-       table #grandTotal td{
+       #innerTable #grandTotal td{
          border-bottom: solid 1px black;
        }
-
-      table #note{
+      #innerTable #note{
         height: 3em;
         overflow: hidden;
       }
 
-      h3 {
-        line-height:1em;
+      .numeric{
+        text-align:right;
       }
-
-      footer {
-        display: flex;
-        position:fixed;
-        bottom: 0;
-        left: 30%;
-        text-align:center;
-      }
-
-      .sign:nth-child(2){
-        margin-left: 5em;
-      }
-      
-      .sign:last-child{
-        margin-left: 5em;
-      }
-
-      .sign h3{
-        padding-bottom: 3em;
-      }
-    }
+  }
   `;
 
 class Invoice extends React.PureComponent {
   render() {
-    const sizePerPage = 10; // items per page
-
-    let dataLength = this.props.state.data.length; // items count
-    let pageCount = Math.ceil(dataLength / sizePerPage); // page count
-
-    let invoicePages = [];
-
-    for (var i = 0; i < pageCount; i++) {
-      let startIndex = i * sizePerPage; // start index for item slicing, if sizeperpage = 10 then startindex 0, 10, 20, ...
-      let endIndex = startIndex + sizePerPage; // end index for item slicing
-      let lastPageItems = dataLength % sizePerPage; // item count for last page, maybe lower than sizeperpage
-      if(i === pageCount - 1 && lastPageItems !== 0){ // if last page and last page item count != sizeperpage
-        endIndex = startIndex + lastPageItems;
-      }
-      invoicePages.push(
-        <div className="invoice page-break" key={`page${i   +   1}`}>
-          <TopPart page={i+1} pageCount={pageCount}/>
-          <Header {...this.props.state.buyerInfo} />
-          <TableItems {...this.props} start={startIndex} end={endIndex} isLastPage={i === pageCount - 1}/>
+    return (
+      <div id="invoice">
+        <table id="outerTable">
+          <thead>
+            <Header />
+          </thead>
+          <tbody>
+            <BuyerCompany {...this.props.state.buyerInfo} />
+            <Dates {...this.props.state.buyerInfo} />
+            <TableItems {...this.props} />
+          </tbody>
+          <tfoot>
+            <tr><td></td></tr>
+          </tfoot>
+        </table>
+        <div id="footer">
           <Footer {...this.props.state} />
         </div>
-      );
-    }
-
-    return <div>{invoicePages}</div>;
+      </div>
+    );
   }
 }
 
+const Header = () => {
+  return (
+    <header>
+      <TopPart />
+    </header>
+  );
+};
+
 const TopPart = (props) => {
   return (
-    <div id="top">
+    <div>
       <div className="column">
         <img src={logo} alt="logo" />
       </div>
       <h1 id="title" className="column">
         FAKTUR PENJUALAN
       </h1>
-      <h3 id="pageNo" className="column">
-        Page {props.page} of {props.pageCount}
-      </h3>
     </div>
   );
 };
@@ -182,7 +178,7 @@ const SellerCompany = () => {
 
 const BuyerCompany = (props) => {
   return (
-    <div id="buyerCompany" className="column">
+    <div id="buyerCompany">
       <h3>Kepada Yth.</h3>
       <h3>{props.name}</h3>
       <h3>{props.address}</h3>
@@ -209,23 +205,9 @@ const Dates = (props) => {
   );
 };
 
-const Header = (props) => {
-  return (
-    <header>
-      <Dates {...props} />
-      <div className="column"></div>
-      <BuyerCompany {...props} />
-    </header>
-  );
-};;
-
 const TableItems = (props) => {
-  let startIndex = props.start;
-  let endIndex = props.end;
-  let subset = props.state.data.slice(startIndex, endIndex);
-
   return (
-    <table>
+    <table id="innerTable">
       <colgroup>
         <col span="1" style={{ width: "5%" }} />
         <col span="1" style={{ width: "20%" }} />
@@ -251,30 +233,30 @@ const TableItems = (props) => {
         </tr>
       </thead>
       <tbody>
-        {subset.map((item, outerIndex) => {
+        {props.state.data.map((item, outerIndex) => {
           return (
             <tr key={outerIndex} className="items">
               {Object.keys(item).map((column, innerIndex) => {
-                if  (column !== "count")
-                    return  (
-                  <td
-                    key={innerIndex}
-                    {...((column === "price" || column === "qty") && {
-                      className: "numeric",
-                    })}
-                  >
-                    {column === "price" ? (
-                      <NumberFormat
-                        format={numberWithCommas}
-                        displayType="text"
-                        value={item[column]}
-                      />
-                    ) : (
-                      item[column]
-                    )}
-                  </td>
-                );
-              ;
+                if (column !== "count")
+                  return (
+                    <td
+                      key={innerIndex}
+                      {...((column === "price" || column === "qty") && {
+                        className: "numeric",
+                      })}
+                    >
+                      {column === "price" ? (
+                        <NumberFormat
+                          format={numberWithCommas}
+                          displayType="text"
+                          value={item[column]}
+                        />
+                      ) : (
+                        item[column]
+                      )}
+                    </td>
+                  );
+                return "";
               })}
               <td className="numeric">
                 <NumberFormat
@@ -286,10 +268,8 @@ const TableItems = (props) => {
             </tr>
           );
         })}
-      </tbody>
-      {props.isLastPage && <tfoot >
         <tr className="numeric" id="subtotal">
-          <td colSpan="5">Subtotal</td>
+          <td colspan="5">Subtotal</td>
           <td>
             {numberWithCommas(
               props.state.buyerInfo.grandTotal + props.state.buyerInfo.discount
@@ -297,22 +277,22 @@ const TableItems = (props) => {
           </td>
         </tr>
         <tr className="numeric" id="discount">
-          <td colSpan="5">Discount</td>
+          <td colspan="5">Discount</td>
           <td>{numberWithCommas(props.state.buyerInfo.discount)}</td>
         </tr>
         <tr className="numeric" id="grandTotal">
-          <td colSpan="5">Grand total</td>
+          <td colspan="5">Grand total</td>
           <td>{numberWithCommas(props.state.buyerInfo.grandTotal)}</td>
         </tr>
         <tr>
-          <td colSpan="6">
+          <td colspan="6">
             <div id="note">
               Keterangan:
               {props.state.buyerInfo.note}
             </div>
           </td>
         </tr>
-      </tfoot>}
+      </tbody>
     </table>
   );
 };
