@@ -55,7 +55,7 @@ const invoiceStyle = `
       display:flex;
       position: fixed;
       bottom: 0;
-      left: 25%;
+      left: 20%;
       text-align:center;
     }
 
@@ -83,17 +83,18 @@ const invoiceStyle = `
 
     #innerTable th{
       border-left: solid 1px black;
+      border-bottom: solid 0.5px black;
       border-right: solid 1px black;
     }
 
-       #innerTable td{
-         border-bottom: solid 1px black;
+       #innerTable tbody td{
+        border-bottom: solid 1px black;
         border-left: solid 1px black;
         border-right: solid 1px black;
         padding-left: 1mm;
         padding-right: 1mm;
-        vertical-align:text-top; 
       }
+
       #innerTable{
         border-top: solid 1px black;
         border-bottom: solid 1px black;
@@ -103,15 +104,15 @@ const invoiceStyle = `
         border-bottom:1px solid black;
       }
 
-      #innerTable #note td,{
-        border-top: none;
-        border-bottom: none;
-      }
-
-       #innerTable #grandTotal td{
-         border-bottom: solid 1px black;
-       }
       #innerTable #note{
+        white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+        white-space: -pre-wrap;      /* Opera 4-6 */
+        white-space: -o-pre-wrap;    /* Opera 7 */
+        white-space: pre-wrap;       /* css-3 */
+        word-wrap: break-word;       /* Internet Explorer 5.5+ */
+        white-space: -webkit-pre-wrap; /* Newer versions of Chrome/Safari*/
+        word-break: break-all;
+        white-space: normal;
         height: 3em;
         overflow: hidden;
       }

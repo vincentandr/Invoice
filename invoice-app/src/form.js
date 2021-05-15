@@ -281,6 +281,7 @@ const InvoiceForm = () => {
                     initialValue={state.buyerInfo.note}
                   >
                     <Input.TextArea
+                      maxLength={200}
                       onBlur={(e) =>
                         dispatch({
                           type: "UPDATE_FORM_INPUT_VALUE",
@@ -383,6 +384,7 @@ const EditableCell = ({
           style={{ marginBottom: 0 }}
         >
           <Input
+            maxLength={60}
             onBlur={(e) =>
               dispatch({
                 type: "UPDATE_TABLE_INPUT_VALUE",
