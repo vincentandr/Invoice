@@ -24,13 +24,13 @@ const invoiceStyle = `
     .column{
       display: inline-block;
       width: 33%;
-      margin-bottom: 10px;
+      margin-bottom: 1em;
     }
 
     #buyerCompany{
       width: 66%;
       display: inline-block;
-      margin-bottom: 5px;
+      margin-bottom: 1em;
     }
 
     h3 {
