@@ -18,16 +18,19 @@ const invoiceStyle = `
 
     #outerTable tfoot td {
       height: 7em;
+      border-top: solid 1px black;
     }
 
     .column{
       display: inline-block;
       width: 33%;
+      margin-bottom: 10px;
     }
 
     #buyerCompany{
       width: 66%;
       display: inline-block;
+      margin-bottom: 5px;
     }
 
     h3 {
@@ -108,6 +111,9 @@ const invoiceStyle = `
         overflow: hidden;
       }
 
+      .numeric{
+        text-align:right;
+      }
   }
   `;
 
