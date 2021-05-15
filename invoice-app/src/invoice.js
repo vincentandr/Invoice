@@ -288,7 +288,7 @@ const TableItems = (props) => {
         <tr>
           <td colspan="6">
             <div id="note">
-              Keterangan:
+              Keterangan:&nbsp;
               {props.state.buyerInfo.note}
             </div>
           </td>
