@@ -16,6 +16,10 @@ const invoiceStyle = `
 
     #outerTable thead {display: table-header-group;}
 
+    #outerTable tfoot td {
+      height: 7em;
+    }
+
     .column{
       display: inline-block;
       width: 33%;
@@ -51,20 +55,20 @@ const invoiceStyle = `
     }
 
     
-      .sign:nth-child(2){
+      .sign{
+        font-size:0.7em;
         margin-left: 5em;
+        text-align: center;
       }
-      
-      .sign:last-child{
-        margin-left: 5em;
-      }
+          
       .sign h3{
         padding-bottom: 3em;
       }
 
-       #innerTable{
+    #innerTable{
       width:100%;
       border: solid 1px black;
+      page-break-after: always;
     }
 
     #innerTable tr{
@@ -81,6 +85,10 @@ const invoiceStyle = `
       }
       #innerTable, #innerTable th{
         border-bottom: solid 1px black;
+      }
+
+      #innerTable tbody tr:last-child {
+        border-bottom:1px solid black;
       }
 
       #innerTable #note td,{
@@ -117,9 +125,12 @@ class Invoice extends React.PureComponent {
             <TableItems {...this.props} />
           </tbody>
           <tfoot>
-            <Footer {...this.props.state} />
+            <tr><td></td></tr>
           </tfoot>
         </table>
+        <div id="footer">
+          <Footer {...this.props.state} />
+        </div>
       </div>
     );
   }
