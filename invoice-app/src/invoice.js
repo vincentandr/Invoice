@@ -18,7 +18,6 @@ const invoiceStyle = `
 
     #outerTable tfoot td {
       height: 7em;
-      border-top: solid 1px black;
     }
 
     .column{
