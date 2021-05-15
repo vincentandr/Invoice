@@ -78,14 +78,21 @@ const invoiceStyle = `
     }
 
 
-       #innerTable td, #innerTable th{
+    #innerTable th{
+      border-left: solid 1px black;
+      border-right: solid 1px black;
+    }
+
+       #innerTable td{
+         border-bottom: solid 1px black;
         border-left: solid 1px black;
         border-right: solid 1px black;
         padding-left: 1mm;
         padding-right: 1mm;
         vertical-align:text-top; 
       }
-      #innerTable, #innerTable th{
+      #innerTable{
+        border-top: solid 1px black;
         border-bottom: solid 1px black;
       }
 
@@ -97,10 +104,6 @@ const invoiceStyle = `
         border-top: none;
         border-bottom: none;
       }
-
-       #innerTable #subtotal td{
-         border-top: solid 1px black;
-       }
 
        #innerTable #grandTotal td{
          border-bottom: solid 1px black;
