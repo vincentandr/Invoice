@@ -67,7 +67,7 @@ const invoiceStyle = `
       }
           
       .sign h3{
-        padding-bottom: 3em;
+        padding-bottom: 2em;
       }
 
     #innerTable{
@@ -129,15 +129,25 @@ class Invoice extends React.PureComponent {
       <div id="invoice">
         <table id="outerTable">
           <thead>
-            <Header />
+            <tr>
+              <th>
+                <Header />
+              </th>
+            </tr>
           </thead>
           <tbody>
-            <BuyerCompany {...this.props.state.buyerInfo} />
-            <Dates {...this.props.state.buyerInfo} />
-            <TableItems {...this.props} />
+            <tr>
+              <td>
+                <BuyerCompany {...this.props.state.buyerInfo} />
+                <Dates {...this.props.state.buyerInfo} />
+                <TableItems {...this.props} />
+              </td>
+            </tr>
           </tbody>
           <tfoot>
-            <tr><td></td></tr>
+            <tr>
+              <td></td>
+            </tr>
           </tfoot>
         </table>
         <div id="footer">
@@ -150,9 +160,7 @@ class Invoice extends React.PureComponent {
 
 const Header = () => {
   return (
-    <header>
       <TopPart />
-    </header>
   );
 };
 
@@ -169,13 +177,13 @@ const TopPart = (props) => {
   );
 };
 
-const SellerCompany = () => {
-  return (
-    <div id="sellerCompany" className="column">
-      <h3>UD. Maju Jaya Diesel</h3>
-    </div>
-  );
-};
+// const SellerCompany = () => {
+//   return (
+//     <div id="sellerCompany" className="column">
+//       <h3>UD. Maju Jaya Diesel</h3>
+//     </div>
+//   );
+// };
 
 const BuyerCompany = (props) => {
   return (
@@ -257,7 +265,7 @@ const TableItems = (props) => {
                       )}
                     </td>
                   );
-                return "";
+                  return undefined;
               })}
               <td className="numeric">
                 <NumberFormat
@@ -270,7 +278,7 @@ const TableItems = (props) => {
           );
         })}
         <tr className="numeric" id="subtotal">
-          <td colspan="5">Subtotal</td>
+          <td colSpan="5">Subtotal</td>
           <td>
             {numberWithCommas(
               props.state.buyerInfo.grandTotal + props.state.buyerInfo.discount
@@ -278,15 +286,15 @@ const TableItems = (props) => {
           </td>
         </tr>
         <tr className="numeric" id="discount">
-          <td colspan="5">Discount</td>
+          <td colSpan="5">Discount</td>
           <td>{numberWithCommas(props.state.buyerInfo.discount)}</td>
         </tr>
         <tr className="numeric" id="grandTotal">
-          <td colspan="5">Grand total</td>
+          <td colSpan="5">Grand total</td>
           <td>{numberWithCommas(props.state.buyerInfo.grandTotal)}</td>
         </tr>
         <tr>
-          <td colspan="6">
+          <td colSpan="6">
             <div id="note">
               Keterangan:&nbsp;
               {props.state.buyerInfo.note}
