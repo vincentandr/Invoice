@@ -4,10 +4,11 @@ import NumberFormat from "react-number-format";
 import logo from "./assets/logo_with_text.png";
 
 const invoiceStyle = `
-  html *{
-    font-family: "Trebuchet MS";
-  }
-  @media print {  
+  @media print {
+    html *{
+      font-family: "Trebuchet MS";
+    }
+
       @page { 
       size: 21.59cm 13.97cm;
     } 
@@ -258,20 +259,20 @@ const TableItems = (props) => {
                         <NumberFormat
                           format={numberWithCommas}
                           displayType="text"
-                          value={item[column]}
+                          value={(isNaN(item[column])) ? 0 : item[column]}
                         />
                       ) : (
-                        item[column]
+                        (isNaN(item[column])) ? 0 : item[column]
                       )}
                     </td>
                   );
-                  return undefined;
+                return undefined;
               })}
               <td className="numeric">
                 <NumberFormat
                   format={numberWithCommas}
                   displayType="text"
-                  value={item.qty * item.price}
+                  value={(isNaN(item.qty) || isNaN(item.price)) ? 0 : item.qty * item.price}
                 />
               </td>
             </tr>
@@ -279,19 +280,30 @@ const TableItems = (props) => {
         })}
         <tr className="numeric" id="subtotal">
           <td colSpan="5">Subtotal</td>
+          <td>{numberWithCommas(props.state.buyerInfo.subtotal)}</td>
+        </tr>
+        <tr className="numeric" id="discount">
+          <td colSpan="5">{`Discount (${numberWithCommas(
+            props.state.buyerInfo.discount
+          )}%)`}</td>
           <td>
             {numberWithCommas(
-              props.state.buyerInfo.grandTotal + props.state.buyerInfo.discount
+              props.state.buyerInfo.subtotal 
+              * props.state.buyerInfo.discount 
+              / 100
             )}
           </td>
         </tr>
-        <tr className="numeric" id="discount">
-          <td colSpan="5">Discount</td>
-          <td>{numberWithCommas(props.state.buyerInfo.discount)}</td>
-        </tr>
         <tr className="numeric" id="grandTotal">
           <td colSpan="5">Grand total</td>
-          <td>{numberWithCommas(props.state.buyerInfo.grandTotal)}</td>
+          <td>
+            {numberWithCommas(
+              props.state.buyerInfo.subtotal -
+                (props.state.buyerInfo.subtotal *
+                  props.state.buyerInfo.discount) /
+                  100
+            )}
+          </td>
         </tr>
         <tr>
           <td colSpan="6">

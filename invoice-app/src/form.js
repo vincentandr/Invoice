@@ -14,12 +14,7 @@ import NumberFormat from "react-number-format";
 import { useReactToPrint } from "react-to-print";
 import reducer from "./reducer.js";
 import moment from "moment";
-import {
-  numberWithCommas,
-  getFieldsOnTable,
-  qtyFormat,
-  priceFormat,
-} from "./util.js";
+import { numberWithCommas, getFieldsOnTable} from "./util.js";
 import { Invoice, invoiceStyle} from "./invoice.js";
 
 const InvoiceForm = () => {
@@ -65,7 +60,7 @@ const InvoiceForm = () => {
       city: "",
       note: "",
       discount: 0,
-      grandTotal: 0,
+      subtotal: 0,
     },
     columns: ["No.", "Kode Barang", "Nama Barang", "Qty", "Harga", "Total"],
     pagination: {
@@ -114,7 +109,7 @@ const InvoiceForm = () => {
               <Row>
                 <Col span="11" offset="1">
                   <Form.Item
-                    name="name"
+                    name="companyName"
                     rules={[
                       {
                         required: true,
@@ -344,11 +339,9 @@ const EditableCell = ({
             {...(dataIndex === "price"
               ? {
                   format: numberWithCommas,
-                  isAllowed: priceFormat,
                   allowNegative: true,
                 }
               : {
-                  isAllowed: qtyFormat,
                   allowNegative: false,
                 })}
             value={state.data[index][dataIndex]}
@@ -452,13 +445,16 @@ const ItemsTable = (props) => {
           index +
           (props.state.pagination.current - 1) *
             props.state.pagination.pageSize;
-        return (
-          <NumberFormat
-            format={numberWithCommas}
-            displayType="text"
-            value={props.state.data[idx].qty * props.state.data[idx].price}
-          />
-        );
+          return (
+            <NumberFormat
+              format={numberWithCommas}
+              displayType="text"
+              value={
+                (isNaN(props.state.data[idx].qty) ||
+                isNaN(props.state.data[idx].price)) ? 0 : props.state.data[idx].qty * props.state.data[idx].price
+              }
+            />
+          );
       },
     },
     {
@@ -536,7 +532,7 @@ const ItemsTable = (props) => {
         props.dispatch({ type: "CHANGE_PAGE", payload: page.current });
       })
       .catch((err) => {
-        console.log("error");
+        console.log("form values are missing");
       });
   };
 
@@ -554,50 +550,90 @@ const ItemsTable = (props) => {
             footer={() => {
               return (
                 <div style={{ fontWeight: "bold" }}>
-                  <Row justify="end">
-                    <Col pull="1">Subtotal</Col>
-                    <Col span="3" style={{ textAlign: "end" }}>
+                  <Row>
+                    <Col offset="15" span="3">
+                      Subtotal
+                    </Col>
+                    <Col span="3" offset="3" style={{ textAlign: "end" }}>
                       <NumberFormat
                         displayType="text"
                         format={numberWithCommas}
                         value={
-                          props.state.buyerInfo.grandTotal +
-                          props.state.buyerInfo.discount
+                          isNaN(props.state.buyerInfo.subtotal)
+                            ? 0
+                            : props.state.buyerInfo.subtotal
                         }
                       />
                     </Col>
                   </Row>
-                  <Row justify="end">
-                    <Col pull="1">Discount</Col>
-                    <Col span="3">
-                      <NumberFormat
-                        customInput={Input}
-                        displayType="input"
-                        format={numberWithCommas}
-                        allowNegative={false}
-                        isAllowed={priceFormat}
-                        value={props.state.buyerInfo.discount}
-                        style={{ textAlign: "end" }}
-                        onValueChange={(values) => {
-                          const { value } = values;
-                          props.dispatch({
-                            type: "UPDATE_FORM_INPUT_VALUE",
-                            payload: {
-                              name: "discount",
-                              value: parseInt(value),
-                            },
-                          });
-                        }}
-                      />
+                  <Row align="middle">
+                    <Col offset="15" span="3">
+                      Discount
                     </Col>
-                  </Row>
-                  <Row justify="end">
-                    <Col pull="1">Grand Total</Col>
-                    <Col span="3" style={{ textAlign: "end" }}>
+                    <Col span="2">
+                      <Form.Item
+                        name="discount"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Discount tidak boleh kosong",
+                          },
+                        ]}
+                        initialValue={props.state.buyerInfo.discount}
+                        style={{ marginBottom: 0, fontWeight: "normal" }}
+                      >
+                        <NumberFormat
+                          suffix="%"
+                          customInput={Input}
+                          displayType="input"
+                          allowNegative={false}
+                          value={props.state.buyerInfo.discount}
+                          style={{ textAlign: "end" }}
+                          onValueChange={(values) => {
+                            const { value } = values;
+                            props.dispatch({
+                              type: "UPDATE_FORM_INPUT_VALUE",
+                              payload: {
+                                name: "discount",
+                                value: parseInt(value),
+                              },
+                            });
+                          }}
+                        />
+                      </Form.Item>
+                    </Col>
+                    <Col span="3" offset="1" style={{ textAlign: "end" }}>
                       <NumberFormat
                         displayType="text"
                         format={numberWithCommas}
-                        value={props.state.buyerInfo.grandTotal}
+                        value={
+                          isNaN(props.state.buyerInfo.discount) ||
+                          isNaN(props.state.buyerInfo.subtotal)
+                            ? 0
+                            : (props.state.buyerInfo.subtotal *
+                                props.state.buyerInfo.discount) /
+                              100
+                        }
+                      />
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col offset="15" span="3">
+                      Grand Total
+                    </Col>
+                    <Col span="3" offset="3" style={{ textAlign: "end" }}>
+                      <NumberFormat
+                        displayType="text"
+                        format={numberWithCommas}
+                        value={
+                          isNaN(props.state.buyerInfo.discount) ||
+                          isNaN(props.state.buyerInfo.subtotal)
+                            ? 0
+                            : props.state.buyerInfo.subtotal -
+                              (props.state.buyerInfo.subtotal *
+                                props.state.buyerInfo.discount) /
+                                100
+                        }
                       />
                     </Col>
                   </Row>

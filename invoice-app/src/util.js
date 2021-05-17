@@ -1,16 +1,9 @@
 const numberWithCommas = (x) => {
-  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-};
-
-const qtyFormat = (input) => {
-  const { value } = input;
-  if (value > 0) return input;
-};
-
-const priceFormat = (input) => {
-  const { value } = input;
-  if (value >= 0) return input;
-};
+  var parts = x.toString().split(".");
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return parts[0];
+  //return parts.join(",");
+};;
 
 const getFieldsOnTable = (fields) => {
   let keys = Object.keys(fields);
@@ -18,14 +11,8 @@ const getFieldsOnTable = (fields) => {
   return keys.filter((key) => regex.test(key));
 };
 
-const calculateGrandTotal = (data, discount) => {
-  return data.reduce((sum, item) => sum + item.qty * item.price, 0) - discount;
+const calculateSubtotal = (data) => {
+  return data.reduce((sum, item) => sum + item.qty * item.price, 0);
 };
 
-export {
-  numberWithCommas,
-  getFieldsOnTable,
-  qtyFormat,
-  priceFormat,
-  calculateGrandTotal,
-};
+export { numberWithCommas, getFieldsOnTable, calculateSubtotal };

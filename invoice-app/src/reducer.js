@@ -1,4 +1,4 @@
-import {calculateGrandTotal} from "./util.js"
+import { calculateSubtotal } from "./util.js";
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -31,18 +31,21 @@ const reducer = (state, action) => {
         newItems[i].id = newItems[i].id - 1;
       }
 
-      let grandTotal = calculateGrandTotal(newItems, state.buyerInfo.discount);
+      let subtotal = calculateSubtotal(newItems);
 
       let current = state.pagination.current;
-      
+
       // redirect to previous page if the deleted item is the first and only item of last page
-      if (newItems.length % state.pagination.pageSize === 0 && pageCount === current)
+      if (
+        newItems.length % state.pagination.pageSize === 0 &&
+        pageCount === current
+      )
         current = current - 1;
       return {
         ...state,
         data: newItems,
         pagination: { ...state.pagination, current: current },
-        buyerInfo: { ...state.buyerInfo, grandTotal: grandTotal },
+        buyerInfo: { ...state.buyerInfo, subtotal: subtotal },
       };
     }
     case "REMOVE_ALL": {
@@ -58,7 +61,7 @@ const reducer = (state, action) => {
             price: 0,
           },
         ],
-        buyerInfo: { ...state.buyerInfo, grandTotal: 0, discount: 0 },
+        buyerInfo: { ...state.buyerInfo, subtotal: 0, discount: 0 },
         pagination: {
           ...state.pagination,
           current: 1,
@@ -66,17 +69,12 @@ const reducer = (state, action) => {
       };
     }
     case "UPDATE_FORM_INPUT_VALUE": {
-      let val = action.payload.value;
+      let newVal = action.payload.value;
       let name = action.payload.name;
 
       let dataCopy = { ...state.buyerInfo };
 
-      dataCopy[name] = val;
-
-      if (name === "discount") {
-        var grandTotal = calculateGrandTotal(state.data, dataCopy.discount);
-        dataCopy.grandTotal = grandTotal;
-      }
+      dataCopy[name] = newVal;
 
       return {
         ...state,
@@ -96,12 +94,12 @@ const reducer = (state, action) => {
 
       dataCopy[index] = item;
 
-      let grandTotal = calculateGrandTotal(dataCopy, state.buyerInfo.discount);
+      let subtotal = calculateSubtotal(dataCopy);
 
       return {
         ...state,
         data: [...dataCopy],
-        buyerInfo: { ...state.buyerInfo, grandTotal: grandTotal },
+        buyerInfo: { ...state.buyerInfo, subtotal: subtotal },
       };
     }
     case "TOGGLE_MODAL":
