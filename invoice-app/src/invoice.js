@@ -259,10 +259,12 @@ const TableItems = (props) => {
                         <NumberFormat
                           format={numberWithCommas}
                           displayType="text"
-                          value={(isNaN(item[column])) ? 0 : item[column]}
+                          value={isNaN(item[column]) ? 0 : item[column]}
                         />
+                      ) : column === "qty" && isNaN(item[column]) ? (
+                        0
                       ) : (
-                        (isNaN(item[column])) ? 0 : item[column]
+                        item[column]
                       )}
                     </td>
                   );

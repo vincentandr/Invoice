@@ -521,6 +521,14 @@ const ItemsTable = (props) => {
 
   const removeAll = () => {
     props.dispatch({ type: "REMOVE_ALL", payload: props.form });
+
+    // reset first row form values
+    props.form.setFieldsValue({
+      code0: "",
+      name0: "",
+      qty0: 1,
+      price0: 0,
+    });
   };
 
   const changePage = (page) => {

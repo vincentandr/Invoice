@@ -102,11 +102,6 @@ const reducer = (state, action) => {
         buyerInfo: { ...state.buyerInfo, subtotal: subtotal },
       };
     }
-    case "TOGGLE_MODAL":
-      return {
-        ...state,
-        isShowModal: !state.isShowModal,
-      };
     case "CHANGE_PAGE":
       const newCurrentPage = action.payload;
       return {
