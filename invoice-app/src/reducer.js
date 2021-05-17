@@ -61,7 +61,7 @@ const reducer = (state, action) => {
             price: 0,
           },
         ],
-        buyerInfo: { ...state.buyerInfo, subtotal: 0, discount: 0 },
+        buyerInfo: { ...state.buyerInfo, subtotal: 0 },
         pagination: {
           ...state.pagination,
           current: 1,
