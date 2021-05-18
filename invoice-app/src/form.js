@@ -276,7 +276,7 @@ const InvoiceForm = () => {
                     initialValue={state.buyerInfo.note}
                   >
                     <Input.TextArea
-                      maxLength={200}
+                      maxLength={120}
                       onBlur={(e) =>
                         dispatch({
                           type: "UPDATE_FORM_INPUT_VALUE",
