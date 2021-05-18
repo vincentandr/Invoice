@@ -108,6 +108,19 @@ const reducer = (state, action) => {
         ...state,
         pagination: { ...state.pagination, current: newCurrentPage },
       };
+    case "CHANGE_FORM":
+      const newOption = action.payload;
+
+      var columns =
+        newOption === "faktur"
+          ? ["No.", "Kode Barang", "Nama Barang", "Qty", "Harga", "Total"]
+          : ["No.", "Kode Barang", "Nama Barang", "Qty"];
+
+      return {
+        ...state,
+        columns: columns,
+        activeForm: newOption,
+      };
     default:
       throw new Error("No matching case found");
   }

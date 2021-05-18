@@ -9,7 +9,7 @@ const invoiceStyle = `
       font-family: "Trebuchet MS";
     }
       @page { 
-      size: 21.59cm 13.97cm;
+      size: 21.59cm 13.97cm portrait;
     } 
     .numeric{
       text-align:right;
@@ -110,7 +110,11 @@ const invoiceStyle = `
 
 class Invoice extends React.PureComponent {
   render() {
-    const sizePerPage = 10; // 10 items per print page
+    let sizePerPage = 10; // 10 items per print page
+
+    if(this.props.state.activeForm === "surat"){ // surat jalan tidak ada subtotal / grand total / discount, jadi baris barang bisa muat lbh banyak
+      sizePerPage = 14;
+    }
 
     let dataLength = this.props.state.data.length; // items count
     let pageCount = Math.ceil(dataLength / sizePerPage); // page count
@@ -129,16 +133,13 @@ class Invoice extends React.PureComponent {
         <div className="invoice page-break" key={`page${i + 1}`}>
           <Header
             {...this.props.state.buyerInfo}
+            activeForm={this.props.state.activeForm}
             page={i + 1}
             pageCount={pageCount}
           />
           <BuyerCompany {...this.props.state.buyerInfo} />
-          <Dates {...this.props.state.buyerInfo} />
-          <TableItems
-            {...this.props}
-            start={startIndex}
-            end={endIndex}
-          />
+          <Dates {...this.props.state.buyerInfo} activeForm={this.props.state.activeForm} />
+          <TableItems {...this.props} start={startIndex} end={endIndex} />
           <Footer {...this.props.state} />
         </div>
       );
@@ -154,9 +155,10 @@ const Header = (props) => {
       <div className="column">
         <img src={logo} alt="logo" />
       </div>
-        <h1 id="title" className="column">
-          FAKTUR PENJUALAN
-        </h1>
+      <h1 id="title" className="column">
+        {props.activeForm === "faktur" && "FAKTUR PENJUALAN"}
+        {props.activeForm === "surat" && "SURAT JALAN"}
+      </h1>
       <h3 id="pageNo" className="column">
         Page {props.page} of {props.pageCount}
       </h3>
@@ -188,14 +190,18 @@ const Dates = (props) => {
     <div className="column">
       <div className="info">
         <h3>
-          <span>No. faktur</span>: {props.number}
+          <span>
+            No. { props.activeForm }
+          </span>: {props.number}
         </h3>
         <h3>
           <span>Tanggal dokumen</span>: {props.date}
         </h3>
-        <h3>
-          <span>Jatuh tempo (30 hari)</span>: {props.due}
-        </h3>
+        { props.activeForm === "faktur" &&
+          <h3>
+            <span>Jatuh tempo (30 hari)</span>: {props.due}
+          </h3>
+        }
       </div>
     </div>
   );
@@ -208,14 +214,24 @@ const TableItems = (props) => {
 
   return (
     <table id="innerTable">
-      <colgroup>
-        <col span="1" style={{ width: "5%" }} />
-        <col span="1" style={{ width: "20%" }} />
-        <col span="1" style={{ width: "45%" }} />
-        <col span="1" style={{ width: "5%" }} />
-        <col span="1" style={{ width: "10%" }} />
-        <col span="1" style={{ width: "15%" }} />
-      </colgroup>
+      {/* Columns width based on faktur / surat jalan (w/o price & total) */}
+      {props.state.activeForm === "faktur" ? (
+        <colgroup>
+          <col span="1" style={{ width: "5%" }} />
+          <col span="1" style={{ width: "20%" }} />
+          <col span="1" style={{ width: "45%" }} />
+          <col span="1" style={{ width: "5%" }} />
+          <col span="1" style={{ width: "10%" }} />
+          <col span="1" style={{ width: "15%" }} />
+        </colgroup>
+      ) : (
+        <colgroup>
+          <col span="1" style={{ width: "5%" }} />
+          <col span="1" style={{ width: "20%" }} />
+          <col span="1" style={{ width: "70%" }} />
+          <col span="1" style={{ width: "5%" }} />
+        </colgroup>
+      )}
       <thead>
         <tr>
           {props.state.columns.map((column, index) => (
@@ -237,7 +253,12 @@ const TableItems = (props) => {
           return (
             <tr key={outerIndex} className="items">
               {Object.keys(item).map((column, innerIndex) => {
-                if (column !== "count")
+                if (
+                  column !== "count" &&
+                  ((column !== "price" &&
+                  props.state.activeForm === "surat") || props.state.activeForm === "faktur")
+                )
+                // Column based on keys of data object
                   return (
                     <td
                       key={innerIndex}
@@ -260,30 +281,42 @@ const TableItems = (props) => {
                   );
                 return undefined;
               })}
-              <td className="numeric">
-                <NumberFormat
-                  format={numberWithCommas}
-                  displayType="text"
-                  value={
-                    isNaN(item.qty) || isNaN(item.price)
-                      ? 0
-                      : item.qty * item.price
-                  }
-                />
-              </td>
+
+              {/* Total column */}
+
+              {props.state.activeForm === "faktur" && (
+                <td className="numeric">
+                  <NumberFormat
+                    format={numberWithCommas}
+                    displayType="text"
+                    value={
+                      isNaN(item.qty) || isNaN(item.price)
+                        ? 0
+                        : item.qty * item.price
+                    }
+                  />
+                </td>
+              )}
             </tr>
           );
         })}
       </tbody>
-        <tfoot>
+      <tfoot>
+        {/* Subtotal, Discount, Grand total, Note only on faktur */}
+        { props.state.activeForm === "faktur" && 
+          <>
           <tr className="numeric" id="subtotal">
-            <td colSpan="5">Subtotal</td>
+            <td colSpan="5">
+              Subtotal
+            </td>
             <td>{numberWithCommas(props.state.buyerInfo.subtotal)}</td>
           </tr>
           <tr className="numeric" id="discount">
-            <td colSpan="5">{`Discount (${numberWithCommas(
+            <td colSpan="5">
+              {`Discount (${numberWithCommas(
               props.state.buyerInfo.discount
-            )}%)`}</td>
+            )}%)`}
+            </td>
             <td>
               {numberWithCommas(
                 (props.state.buyerInfo.subtotal *
@@ -293,7 +326,9 @@ const TableItems = (props) => {
             </td>
           </tr>
           <tr className="numeric" id="grandTotal">
-            <td colSpan="5">Grand total</td>
+            <td colSpan="5">
+              Grand total
+            </td>
             <td>
               {numberWithCommas(
                 props.state.buyerInfo.subtotal -
@@ -303,15 +338,17 @@ const TableItems = (props) => {
               )}
             </td>
           </tr>
-          <tr>
-            <td colSpan="6">
-              <div id="note">
-                Keterangan:&nbsp;
-                {props.state.buyerInfo.note}
-              </div>
-            </td>
-          </tr>
-        </tfoot>
+          </>
+        }
+        <tr>
+          <td colSpan={props.state.activeForm === "faktur" ? 6 : 4}>
+            <div id="note">
+              Keterangan:&nbsp;
+              {props.state.buyerInfo.note}
+            </div>
+          </td>
+        </tr>
+      </tfoot>
     </table>
   );
 };
@@ -320,13 +357,13 @@ const Footer = (props) => {
   return (
     <footer>
       <SignArea person="Penerima" />
-      <SignArea person="Penjual" />
+      <SignArea person={props.activeForm === "faktur" ? "Penjual" : "Hormat kami"} />
       <SignArea person="Checklist" />
     </footer>
   );
 };
 
-const SignArea = ({ person, className }) => {
+const SignArea = ({ person }) => {
   return (
     <div className="sign">
       <h3>{person}</h3>

@@ -9,6 +9,7 @@ import {
   Popconfirm,
   Table,
   Card,
+  Radio,
 } from "antd";
 import NumberFormat from "react-number-format";
 import { useReactToPrint } from "react-to-print";
@@ -39,7 +40,7 @@ const InvoiceForm = () => {
       span: 22,
     },
   };
-
+  
   const defaultState = {
     data: [
       {
@@ -59,7 +60,7 @@ const InvoiceForm = () => {
       due: moment(new Date()).add(30, "days").format("DD-MM-YYYY"),
       city: "",
       note: "",
-      discount: 0,
+      discount: 1,
       subtotal: 0,
     },
     columns: ["No.", "Kode Barang", "Nama Barang", "Qty", "Harga", "Total"],
@@ -67,7 +68,7 @@ const InvoiceForm = () => {
       current: 1,
       pageSize: 5,
     },
-    isShowModal: false,
+    activeForm: "faktur",
   };
 
   const [form] = Form.useForm();
@@ -87,13 +88,35 @@ const InvoiceForm = () => {
     );
   };
 
+  const changeForm = (e) => {
+    console.log(state.columns);
+    dispatch({ type: "CHANGE_FORM", payload: e.target.value });
+  };
+
   return (
     <>
       <div style={{ overflow: "hidden", height: 0 }}>
         <Invoice ref={invoiceToPrint} state={state} />
       </div>
-      <Row justify="center">
-        <h2>Info Faktur</h2>
+      <Row style={{ marginTop: "1vw" }}>
+        <Col offset="4">
+          <Radio.Group
+            defaultValue="faktur"
+            buttonStyle="solid"
+            onChange={changeForm}
+          >
+            <Radio.Button value="faktur">Faktur Penjualan</Radio.Button>
+            <Radio.Button value="surat">Surat Jalan</Radio.Button>
+            <Radio.Button value="kwitansi">Kwitansi</Radio.Button>
+          </Radio.Group>
+        </Col>
+        <Col offset="2">
+          <h2>
+            {state.activeForm === "faktur" && "Info Faktur"}
+            {state.activeForm === "surat" && "Info Surat Jalan"}
+            {state.activeForm === "kwitansi" && "Info Kwitansi"}
+          </h2>
+        </Col>
       </Row>
       <Row>
         <Col offset="4" span="16">
@@ -214,33 +237,36 @@ const InvoiceForm = () => {
                     />
                   </Form.Item>
                 </Col>
-                <Col span="7">
-                  <Form.Item
-                    name="due"
-                    label="Jatuh Tempo"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Jatuh tempo tidak boleh kosong",
-                      },
-                    ]}
-                    initialValue={moment(state.buyerInfo.due, "DD-MM-YYYY")}
-                  >
-                    <DatePicker
-                      format="DD-MM-YYYY"
-                      onBlur={(e) =>
-                        dispatch({
-                          type: "UPDATE_FORM_INPUT_VALUE",
-                          payload: {
-                            name: "due",
-                            value: e.target.value,
-                          },
-                        })
-                      }
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span="9">
+                {state.activeForm === "faktur" && 
+                  (
+                  <Col span="7">
+                        <Form.Item
+                          name="due"
+                          label="Jatuh Tempo"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Jatuh tempo tidak boleh kosong",
+                            },
+                          ]}
+                          initialValue={moment(state.buyerInfo.due, "DD-MM-YYYY")}
+                        >
+                          <DatePicker
+                            format="DD-MM-YYYY"
+                            onBlur={(e) =>
+                              dispatch({
+                                type: "UPDATE_FORM_INPUT_VALUE",
+                                payload: {
+                                  name: "due",
+                                  value: e.target.value,
+                                },
+                              })
+                            }
+                          />
+                        </Form.Item>
+                      </Col>
+                )}
+                <Col flex="auto">
                   <Form.Item
                     name="city"
                     label="Kota"
@@ -404,70 +430,114 @@ const ItemsTable = (props) => {
     },
   };
 
-  const columns = [
-    {
-      title: props.state.columns[0],
-      dataIndex: "id",
-      width: "5%",
-    },
-    {
-      title: props.state.columns[1],
-      dataIndex: "code",
-      editable: true,
-      width: "15%",
-    },
-    {
-      title: props.state.columns[2],
-      dataIndex: "name",
-      editable: true,
-      width: "25%",
-    },
-    {
-      title: props.state.columns[3],
-      dataIndex: "qty",
-      editable: true,
-      width: "10%",
-      align: "right",
-    },
-    {
-      title: props.state.columns[4],
-      dataIndex: "price",
-      editable: true,
-      width: "15%",
-      align: "right",
-    },
-    {
-      title: props.state.columns[5],
-      dataIndex: "total",
-      align: "right",
-      render: (text, _, index) => {
-        let idx =
-          index +
-          (props.state.pagination.current - 1) *
-            props.state.pagination.pageSize;
+  var columns = []
+  
+  if (props.state.activeForm === "faktur"){
+    columns = [
+      {
+        title: props.state.columns[0],
+        dataIndex: "id",
+        width: "5%",
+      },
+      {
+        title: props.state.columns[1],
+        dataIndex: "code",
+        editable: true,
+        width: "15%",
+      },
+      {
+        title: props.state.columns[2],
+        dataIndex: "name",
+        editable: true,
+        width: "25%",
+      },
+      {
+        title: props.state.columns[3],
+        dataIndex: "qty",
+        editable: true,
+        width: "10%",
+        align: "right",
+      },
+      {
+        title: props.state.columns[4],
+        dataIndex: "price",
+        editable: true,
+        width: "15%",
+        align: "right",
+      },
+      {
+        title: props.state.columns[5],
+        dataIndex: "total",
+        align: "right",
+        render: (text, _, index) => {
+          let idx =
+            index +
+            (props.state.pagination.current - 1) *
+              props.state.pagination.pageSize;
           return (
             <NumberFormat
               format={numberWithCommas}
               displayType="text"
               value={
-                (isNaN(props.state.data[idx].qty) ||
-                isNaN(props.state.data[idx].price)) ? 0 : props.state.data[idx].qty * props.state.data[idx].price
+                isNaN(props.state.data[idx].qty) ||
+                isNaN(props.state.data[idx].price)
+                  ? 0
+                  : props.state.data[idx].qty * props.state.data[idx].price
               }
             />
           );
+        },
       },
-    },
-    {
-      title: "Hapus",
-      dataIndex: "remove",
-      render: (_, record) =>
-        props.state.data.length > 1 ? (
-          <Button type="default" danger onClick={() => removeItem(record.id)}>
-            Hapus
-          </Button>
-        ) : null,
-    },
-  ];
+      {
+        title: "Hapus",
+        dataIndex: "remove",
+        render: (_, record) =>
+          props.state.data.length > 1 ? (
+            <Button type="default" danger onClick={() => removeItem(record.id)}>
+              Hapus
+            </Button>
+          ) : null,
+      },
+    ];
+  } else if(props.state.activeForm === "surat"){
+    columns = [
+      {
+        title: props.state.columns[0],
+        dataIndex: "id",
+        width: "5%",
+      },
+      {
+        title: props.state.columns[1],
+        dataIndex: "code",
+        editable: true,
+        width: "15%",
+      },
+      {
+        title: props.state.columns[2],
+        dataIndex: "name",
+        editable: true,
+        width: "50%",
+      },
+      {
+        title: props.state.columns[3],
+        dataIndex: "qty",
+        editable: true,
+        width: "10%",
+        align: "right",
+      },
+      {
+        title: "Hapus",
+        dataIndex: "remove",
+        render: (_, record) =>
+          props.state.data.length > 1 ? (
+            <Button type="default" danger onClick={() => removeItem(record.id)}>
+              Hapus
+            </Button>
+          ) : null,
+      },
+    ];
+  }
+    
 
   const tableColumns = columns.map((col) => {
     if (!col.editable) {
