@@ -111,6 +111,7 @@ const reducer = (state, action) => {
     case "CHANGE_FORM":
       const newOption = action.payload;
 
+      // If changing form to faktur then printed table columns are adjusted
       var columns =
         newOption === "faktur"
           ? ["No.", "Kode Barang", "Nama Barang", "Qty", "Harga", "Total"]
@@ -119,7 +120,6 @@ const reducer = (state, action) => {
       return {
         ...state,
         columns: columns,
-        activeForm: newOption,
       };
     default:
       throw new Error("No matching case found");

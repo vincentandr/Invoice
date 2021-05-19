@@ -108,11 +108,11 @@ const invoiceStyle = `
   }
   `;
 
-class Invoice extends React.PureComponent {
+class InvoiceToPrint extends React.PureComponent {
   render() {
     let sizePerPage = 10; // 10 items per print page
 
-    if(this.props.state.activeForm === "surat"){ // surat jalan tidak ada subtotal / grand total / discount, jadi baris barang bisa muat lbh banyak
+    if(this.props.formState === "surat"){ // surat jalan tidak ada subtotal / grand total / discount, jadi baris barang bisa muat lbh banyak
       sizePerPage = 14;
     }
 
@@ -133,12 +133,12 @@ class Invoice extends React.PureComponent {
         <div className="invoice page-break" key={`page${i + 1}`}>
           <Header
             {...this.props.state.buyerInfo}
-            activeForm={this.props.state.activeForm}
+            formState={this.props.formState}
             page={i + 1}
             pageCount={pageCount}
           />
           <BuyerCompany {...this.props.state.buyerInfo} />
-          <Dates {...this.props.state.buyerInfo} activeForm={this.props.state.activeForm} />
+          <Dates {...this.props.state.buyerInfo} formState={this.props.formState} />
           <TableItems {...this.props} start={startIndex} end={endIndex} />
           <Footer {...this.props.state} />
         </div>
@@ -156,8 +156,8 @@ const Header = (props) => {
         <img src={logo} alt="logo" />
       </div>
       <h1 id="title" className="column">
-        {props.activeForm === "faktur" && "FAKTUR PENJUALAN"}
-        {props.activeForm === "surat" && "SURAT JALAN"}
+        {props.formState === "faktur" && "FAKTUR PENJUALAN"}
+        {props.formState === "surat" && "SURAT JALAN"}
       </h1>
       <h3 id="pageNo" className="column">
         Page {props.page} of {props.pageCount}
@@ -191,13 +191,13 @@ const Dates = (props) => {
       <div className="info">
         <h3>
           <span>
-            No. { props.activeForm }
+            No. { props.formState }
           </span>: {props.number}
         </h3>
         <h3>
           <span>Tanggal dokumen</span>: {props.date}
         </h3>
-        { props.activeForm === "faktur" &&
+        { props.formState === "faktur" &&
           <h3>
             <span>Jatuh tempo (30 hari)</span>: {props.due}
           </h3>
@@ -215,7 +215,7 @@ const TableItems = (props) => {
   return (
     <table id="innerTable">
       {/* Columns width based on faktur / surat jalan (w/o price & total) */}
-      {props.state.activeForm === "faktur" ? (
+      {props.formState === "faktur" ? (
         <colgroup>
           <col span="1" style={{ width: "5%" }} />
           <col span="1" style={{ width: "20%" }} />
@@ -256,7 +256,7 @@ const TableItems = (props) => {
                 if (
                   column !== "count" &&
                   ((column !== "price" &&
-                  props.state.activeForm === "surat") || props.state.activeForm === "faktur")
+                  props.formState === "surat") || props.formState === "faktur")
                 )
                 // Column based on keys of data object
                   return (
@@ -284,7 +284,7 @@ const TableItems = (props) => {
 
               {/* Total column */}
 
-              {props.state.activeForm === "faktur" && (
+              {props.formState === "faktur" && (
                 <td className="numeric">
                   <NumberFormat
                     format={numberWithCommas}
@@ -303,7 +303,7 @@ const TableItems = (props) => {
       </tbody>
       <tfoot>
         {/* Subtotal, Discount, Grand total, Note only on faktur */}
-        { props.state.activeForm === "faktur" && 
+        { props.formState === "faktur" && 
           <>
           <tr className="numeric" id="subtotal">
             <td colSpan="5">
@@ -341,7 +341,7 @@ const TableItems = (props) => {
           </>
         }
         <tr>
-          <td colSpan={props.state.activeForm === "faktur" ? 6 : 4}>
+          <td colSpan={props.formState === "faktur" ? 6 : 4}>
             <div id="note">
               Keterangan:&nbsp;
               {props.state.buyerInfo.note}
@@ -357,7 +357,7 @@ const Footer = (props) => {
   return (
     <footer>
       <SignArea person="Penerima" />
-      <SignArea person={props.activeForm === "faktur" ? "Penjual" : "Hormat kami"} />
+      <SignArea person={props.formState === "faktur" ? "Penjual" : "Hormat kami"} />
       <SignArea person="Checklist" />
     </footer>
   );
@@ -372,4 +372,4 @@ const SignArea = ({ person }) => {
   );
 };
 
-export { Invoice, invoiceStyle };
+export { InvoiceToPrint, invoiceStyle };

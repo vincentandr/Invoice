@@ -1,4 +1,3 @@
-import { useRef, useReducer } from "react";
 import {
   Button,
   Form,
@@ -8,325 +7,216 @@ import {
   Col,
   Popconfirm,
   Table,
-  Card,
-  Radio,
 } from "antd";
 import NumberFormat from "react-number-format";
-import { useReactToPrint } from "react-to-print";
-import reducer from "./reducer.js";
 import moment from "moment";
-import { numberWithCommas, getFieldsOnTable} from "./util.js";
-import { Invoice, invoiceStyle} from "./invoice.js";
+import { numberWithCommas, getFieldsOnTable  } from "./util.js";
 
-const InvoiceForm = () => {
-  const validateMessages = {
-    required: null,
-  };
-
-  const layout = {
-    labelCol: {
-      span: 10,
-    },
-    wrapperCol: {
-      span: 22,
-    },
-  };
-
-  const fullLayout = {
-    labelCol: {
-      span: 22,
-    },
-    wrapperCol: {
-      span: 22,
-    },
-  };
-  
-  const defaultState = {
-    data: [
-      {
-        id: 1,
-        count: 1,
-        code: "",
-        name: "",
-        qty: 1,
-        price: 0,
-      },
-    ],
-    buyerInfo: {
-      name: "",
-      number: "",
-      address: "",
-      date: moment(new Date()).format("DD-MM-YYYY"),
-      due: moment(new Date()).add(30, "days").format("DD-MM-YYYY"),
-      city: "",
-      note: "",
-      discount: 1,
-      subtotal: 0,
-    },
-    columns: ["No.", "Kode Barang", "Nama Barang", "Qty", "Harga", "Total"],
-    pagination: {
-      current: 1,
-      pageSize: 5,
-    },
-    activeForm: "faktur",
-  };
-
+const InvoiceForm = (props) => {
   const [form] = Form.useForm();
-  const [state, dispatch] = useReducer(reducer, defaultState);
-  const invoiceToPrint = useRef();
-
-  const handleFinish = useReactToPrint({
-    content: () => invoiceToPrint.current,
-    pageStyle:
-      invoiceStyle,
-  });
-
-  const isButtonDisabled = () => {
-    return (
-      Math.ceil(state.data.length / state.pagination.pageSize) !==
-      state.pagination.current
-    );
-  };
-
-  const changeForm = (e) => {
-    console.log(state.columns);
-    dispatch({ type: "CHANGE_FORM", payload: e.target.value });
-  };
 
   return (
-    <>
-      <div style={{ overflow: "hidden", height: 0 }}>
-        <Invoice ref={invoiceToPrint} state={state} />
-      </div>
-      <Row style={{ marginTop: "1vw" }}>
-        <Col offset="4">
-          <Radio.Group
-            defaultValue="faktur"
-            buttonStyle="solid"
-            onChange={changeForm}
+    <Form
+      form={form}
+      layout="vertical"
+      onFinish={props.submitHandler}
+      scrollToFirstError
+    >
+      <Row>
+        <Col span="13" offset="1">
+          <Form.Item
+            name="companyName"
+            rules={[
+              {
+                required: true,
+                message: "Nama perusahaan tidak boleh kosong",
+              },
+            ]}
+            label="Nama Perusahaan"
+            initialValue={props.state.buyerInfo.name}
           >
-            <Radio.Button value="faktur">Faktur Penjualan</Radio.Button>
-            <Radio.Button value="surat">Surat Jalan</Radio.Button>
-            <Radio.Button value="kwitansi">Kwitansi</Radio.Button>
-          </Radio.Group>
+            <Input
+              onBlur={(e) =>
+                props.dispatch({
+                  type: "UPDATE_FORM_INPUT_VALUE",
+                  payload: {
+                    name: "name",
+                    value: e.target.value,
+                  },
+                })
+              }
+            />
+          </Form.Item>
         </Col>
-        <Col offset="2">
-          <h2>
-            {state.activeForm === "faktur" && "Info Faktur"}
-            {state.activeForm === "surat" && "Info Surat Jalan"}
-            {state.activeForm === "kwitansi" && "Info Kwitansi"}
-          </h2>
+        <Col span="8" offset="1">
+          <Form.Item
+            name="city"
+            label="Kota"
+            rules={[
+              {
+                required: true,
+                message: "Kota tidak boleh kosong",
+              },
+            ]}
+            initialValue={props.state.buyerInfo.city}
+          >
+            <Input
+              onBlur={(e) =>
+                props.dispatch({
+                  type: "UPDATE_FORM_INPUT_VALUE",
+                  payload: {
+                    name: "city",
+                    value: e.target.value,
+                  },
+                })
+              }
+            />
+          </Form.Item>
         </Col>
       </Row>
       <Row>
-        <Col offset="4" span="16">
-          <Card>
-            <Form
-              {...layout}
-              form={form}
-              layout="vertical"
-              validateMessages={validateMessages}
-              onFinish={handleFinish}
-              scrollToFirstError
-            >
-              <Row>
-                <Col span="11" offset="1">
-                  <Form.Item
-                    name="companyName"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Nama perusahaan tidak boleh kosong",
-                      },
-                    ]}
-                    label="Nama Perusahaan"
-                    initialValue={state.buyerInfo.name}
-                  >
-                    <Input
-                      onBlur={(e) =>
-                        dispatch({
-                          type: "UPDATE_FORM_INPUT_VALUE",
-                          payload: {
-                            name: "name",
-                            value: e.target.value,
-                          },
-                        })
-                      }
-                    />
-                  </Form.Item>
-                </Col>
-                <Col span="11">
-                  <Form.Item
-                    name="number"
-                    label="Nomor Faktur Jual"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Nomor faktur jual tidak boleh kosong",
-                      },
-                    ]}
-                    initialValue={state.buyerInfo.number}
-                  >
-                    <Input
-                      onBlur={(e) =>
-                        dispatch({
-                          type: "UPDATE_FORM_INPUT_VALUE",
-                          payload: {
-                            name: "number",
-                            value: e.target.value,
-                          },
-                        })
-                      }
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row>
-                <Col span="23" offset="1">
-                  <Form.Item
-                    name="address"
-                    label="Alamat Perusahaan"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Alamat perusahaan tidak boleh kosong",
-                      },
-                    ]}
-                    initialValue={state.buyerInfo.address}
-                    {...fullLayout}
-                  >
-                    <Input
-                      maxLength={80}
-                      onBlur={(e) =>
-                        dispatch({
-                          type: "UPDATE_FORM_INPUT_VALUE",
-                          payload: {
-                            name: "address",
-                            value: e.target.value,
-                          },
-                        })
-                      }
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row>
-                <Col span="7" offset="1">
-                  <Form.Item
-                    name="date"
-                    label="Tanggal"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Tanggal tidak boleh kosong",
-                      },
-                    ]}
-                    initialValue={moment(state.buyerInfo.date, "DD-MM-YYYY")}
-                  >
-                    <DatePicker
-                      format="DD-MM-YYYY"
-                      onBlur={(e) =>
-                        dispatch({
-                          type: "UPDATE_FORM_INPUT_VALUE",
-                          payload: {
-                            name: "date",
-                            value: e.target.value,
-                          },
-                        })
-                      }
-                    />
-                  </Form.Item>
-                </Col>
-                {state.activeForm === "faktur" && 
-                  (
-                  <Col span="7">
-                        <Form.Item
-                          name="due"
-                          label="Jatuh Tempo"
-                          rules={[
-                            {
-                              required: true,
-                              message: "Jatuh tempo tidak boleh kosong",
-                            },
-                          ]}
-                          initialValue={moment(state.buyerInfo.due, "DD-MM-YYYY")}
-                        >
-                          <DatePicker
-                            format="DD-MM-YYYY"
-                            onBlur={(e) =>
-                              dispatch({
-                                type: "UPDATE_FORM_INPUT_VALUE",
-                                payload: {
-                                  name: "due",
-                                  value: e.target.value,
-                                },
-                              })
-                            }
-                          />
-                        </Form.Item>
-                      </Col>
-                )}
-                <Col flex="auto">
-                  <Form.Item
-                    name="city"
-                    label="Kota"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Kota tidak boleh kosong",
-                      },
-                    ]}
-                    initialValue={state.buyerInfo.city}
-                    wrapperCol={{ span: "19" }}
-                  >
-                    <Input
-                      onBlur={(e) =>
-                        dispatch({
-                          type: "UPDATE_FORM_INPUT_VALUE",
-                          payload: {
-                            name: "city",
-                            value: e.target.value,
-                          },
-                        })
-                      }
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row>
-                <Col span="23" offset="1">
-                  <Form.Item
-                    label="Keterangan"
-                    {...fullLayout}
-                    name="note"
-                    initialValue={state.buyerInfo.note}
-                  >
-                    <Input.TextArea
-                      maxLength={120}
-                      onBlur={(e) =>
-                        dispatch({
-                          type: "UPDATE_FORM_INPUT_VALUE",
-                          payload: {
-                            name: "note",
-                            value: e.target.value,
-                          },
-                        })
-                      }
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <ItemsTable
-                dispatch={dispatch}
-                state={state}
-                form={form}
-                isButtonDisabled={isButtonDisabled()}
-              />
-            </Form>
-          </Card>
+        <Col span="22" offset="1">
+          <Form.Item
+            name="address"
+            label="Alamat Perusahaan"
+            rules={[
+              {
+                required: true,
+                message: "Alamat perusahaan tidak boleh kosong",
+              },
+            ]}
+            initialValue={props.state.buyerInfo.address}
+          >
+            <Input
+              maxLength={80}
+              onBlur={(e) =>
+                props.dispatch({
+                  type: "UPDATE_FORM_INPUT_VALUE",
+                  payload: {
+                    name: "address",
+                    value: e.target.value,
+                  },
+                })
+              }
+            />
+          </Form.Item>
         </Col>
       </Row>
-    </>
+      <Row>
+        <Col span="6" offset="1">
+          <Form.Item
+            name="date"
+            label="Tanggal"
+            rules={[
+              {
+                required: true,
+                message: "Tanggal tidak boleh kosong",
+              },
+            ]}
+            initialValue={moment(props.state.buyerInfo.date, "DD-MM-YYYY")}
+          >
+            <DatePicker
+              format="DD-MM-YYYY"
+              onBlur={(e) =>
+                props.dispatch({
+                  type: "UPDATE_FORM_INPUT_VALUE",
+                  payload: {
+                    name: "date",
+                    value: e.target.value,
+                  },
+                })
+              }
+            />
+          </Form.Item>
+        </Col>
+        {props.formState === "faktur" && (
+          <Col span="7">
+            <Form.Item
+              name="due"
+              label="Jatuh Tempo"
+              rules={[
+                {
+                  required: true,
+                  message: "Jatuh tempo tidak boleh kosong",
+                },
+              ]}
+              initialValue={moment(props.state.buyerInfo.due, "DD-MM-YYYY")}
+            >
+              <DatePicker
+                format="DD-MM-YYYY"
+                onBlur={(e) =>
+                  props.dispatch({
+                    type: "UPDATE_FORM_INPUT_VALUE",
+                    payload: {
+                      name: "due",
+                      value: e.target.value,
+                    },
+                  })
+                }
+              />
+            </Form.Item>
+          </Col>
+        )}
+        <Col flex="auto" pull="1">
+          <Form.Item
+            name="number"
+            label={
+              props.formState === "faktur"
+                ? "Nomor Faktur Jual"
+                : "Nomor Surat Jalan"
+            }
+            rules={[
+              {
+                required: true,
+                message: "Nomor faktur jual tidak boleh kosong",
+              },
+            ]}
+            initialValue={props.state.buyerInfo.number}
+          >
+            <Input
+              onBlur={(e) =>
+                props.dispatch({
+                  type: "UPDATE_FORM_INPUT_VALUE",
+                  payload: {
+                    name: "number",
+                    value: e.target.value,
+                  },
+                })
+              }
+            />
+          </Form.Item>
+        </Col>
+      </Row>
+      <Row>
+        <Col span="22" offset="1">
+          <Form.Item
+            label="Keterangan"
+            name="note"
+            initialValue={props.state.buyerInfo.note}
+          >
+            <Input.TextArea
+              maxLength={120}
+              onBlur={(e) =>
+                props.dispatch({
+                  type: "UPDATE_FORM_INPUT_VALUE",
+                  payload: {
+                    name: "note",
+                    value: e.target.value,
+                  },
+                })
+              }
+            />
+          </Form.Item>
+        </Col>
+      </Row>
+      <ItemsTable
+        dispatch={props.dispatch}
+        state={props.state}
+        form={form}
+        formState={props.formState}
+        isButtonHidden={props.isButtonHidden}
+      />
+    </Form>
   );
 };
 
@@ -339,6 +229,7 @@ const EditableCell = ({
   title,
   state,
   dispatch,
+  formState,
   ...restProps
 }) => {
   let childNode = children;
@@ -430,9 +321,9 @@ const ItemsTable = (props) => {
     },
   };
 
-  var columns = []
-  
-  if (props.state.activeForm === "faktur"){
+  var columns = [];
+
+  if (props.formState === "faktur")   {
     columns = [
       {
         title: props.state.columns[0],
@@ -499,7 +390,7 @@ const ItemsTable = (props) => {
           ) : null,
       },
     ];
-  } else if(props.state.activeForm === "surat"){
+  } else if   (props.formState === "surat")   {
     columns = [
       {
         title: props.state.columns[0],
@@ -537,7 +428,6 @@ const ItemsTable = (props) => {
       },
     ];
   }
-    
 
   const tableColumns = columns.map((col) => {
     if (!col.editable) {
@@ -554,6 +444,7 @@ const ItemsTable = (props) => {
         title: col.title,
         state: props.state,
         dispatch: props.dispatch,
+        formState: props.formState,
       }),
     };
   });
@@ -617,7 +508,7 @@ const ItemsTable = (props) => {
   return (
     <>
       <Row>
-        <Col span="23">
+        <Col span="22" offset="1">
           <Table
             components={components}
             dataSource={props.state.data}
@@ -625,99 +516,101 @@ const ItemsTable = (props) => {
             pagination={props.state.pagination}
             onChange={(pagination) => changePage(pagination)}
             rowKey="count"
-            footer={() => {
-              return (
-                <div style={{ fontWeight: "bold" }}>
-                  <Row>
-                    <Col offset="15" span="3">
-                      Subtotal
-                    </Col>
-                    <Col span="3" offset="3" style={{ textAlign: "end" }}>
-                      <NumberFormat
-                        displayType="text"
-                        format={numberWithCommas}
-                        value={
-                          isNaN(props.state.buyerInfo.subtotal)
-                            ? 0
-                            : props.state.buyerInfo.subtotal
-                        }
-                      />
-                    </Col>
-                  </Row>
-                  <Row align="middle">
-                    <Col offset="15" span="3">
-                      Discount
-                    </Col>
-                    <Col span="2">
-                      <Form.Item
-                        name="discount"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Discount tidak boleh kosong",
-                          },
-                        ]}
-                        initialValue={props.state.buyerInfo.discount}
-                        style={{ marginBottom: 0, fontWeight: "normal" }}
-                      >
+            {...(props.formState === "faktur" && {
+              footer: () => {
+                return (
+                  <div style={{ fontWeight: "bold" }}>
+                    <Row>
+                      <Col offset="15" span="3">
+                        Subtotal
+                      </Col>
+                      <Col span="3" offset="3" style={{ textAlign: "end" }}>
                         <NumberFormat
-                          suffix="%"
-                          customInput={Input}
-                          displayType="input"
-                          allowNegative={false}
-                          value={props.state.buyerInfo.discount}
-                          style={{ textAlign: "end" }}
-                          onValueChange={(values) => {
-                            const { value } = values;
-                            props.dispatch({
-                              type: "UPDATE_FORM_INPUT_VALUE",
-                              payload: {
-                                name: "discount",
-                                value: parseInt(value),
-                              },
-                            });
-                          }}
+                          displayType="text"
+                          format={numberWithCommas}
+                          value={
+                            isNaN(props.state.buyerInfo.subtotal)
+                              ? 0
+                              : props.state.buyerInfo.subtotal
+                          }
                         />
-                      </Form.Item>
-                    </Col>
-                    <Col span="3" offset="1" style={{ textAlign: "end" }}>
-                      <NumberFormat
-                        displayType="text"
-                        format={numberWithCommas}
-                        value={
-                          isNaN(props.state.buyerInfo.discount) ||
-                          isNaN(props.state.buyerInfo.subtotal)
-                            ? 0
-                            : (props.state.buyerInfo.subtotal *
-                                props.state.buyerInfo.discount) /
-                              100
-                        }
-                      />
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col offset="15" span="3">
-                      Grand Total
-                    </Col>
-                    <Col span="3" offset="3" style={{ textAlign: "end" }}>
-                      <NumberFormat
-                        displayType="text"
-                        format={numberWithCommas}
-                        value={
-                          isNaN(props.state.buyerInfo.discount) ||
-                          isNaN(props.state.buyerInfo.subtotal)
-                            ? 0
-                            : props.state.buyerInfo.subtotal -
-                              (props.state.buyerInfo.subtotal *
-                                props.state.buyerInfo.discount) /
+                      </Col>
+                    </Row>
+                    <Row align="middle">
+                      <Col offset="15" span="3">
+                        Discount
+                      </Col>
+                      <Col span="2">
+                        <Form.Item
+                          name="discount"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Discount tidak boleh kosong",
+                            },
+                          ]}
+                          initialValue={props.state.buyerInfo.discount}
+                          style={{ marginBottom: 0, fontWeight: "normal" }}
+                        >
+                          <NumberFormat
+                            suffix="%"
+                            customInput={Input}
+                            displayType="input"
+                            allowNegative={false}
+                            value={props.state.buyerInfo.discount}
+                            style={{ textAlign: "end" }}
+                            onValueChange={(values) => {
+                              const { value } = values;
+                              props.dispatch({
+                                type: "UPDATE_FORM_INPUT_VALUE",
+                                payload: {
+                                  name: "discount",
+                                  value: parseInt(value),
+                                },
+                              });
+                            }}
+                          />
+                        </Form.Item>
+                      </Col>
+                      <Col span="3" offset="1" style={{ textAlign: "end" }}>
+                        <NumberFormat
+                          displayType="text"
+                          format={numberWithCommas}
+                          value={
+                            isNaN(props.state.buyerInfo.discount) ||
+                            isNaN(props.state.buyerInfo.subtotal)
+                              ? 0
+                              : (props.state.buyerInfo.subtotal *
+                                  props.state.buyerInfo.discount) /
                                 100
-                        }
-                      />
-                    </Col>
-                  </Row>
-                </div>
-              );
-            }}
+                          }
+                        />
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col offset="15" span="3">
+                        Grand Total
+                      </Col>
+                      <Col span="3" offset="3" style={{ textAlign: "end" }}>
+                        <NumberFormat
+                          displayType="text"
+                          format={numberWithCommas}
+                          value={
+                            isNaN(props.state.buyerInfo.discount) ||
+                            isNaN(props.state.buyerInfo.subtotal)
+                              ? 0
+                              : props.state.buyerInfo.subtotal -
+                                (props.state.buyerInfo.subtotal *
+                                  props.state.buyerInfo.discount) /
+                                  100
+                          }
+                        />
+                      </Col>
+                    </Row>
+                  </div>
+                );
+              },
+            })}
           />
         </Col>
       </Row>
@@ -727,7 +620,7 @@ const ItemsTable = (props) => {
             type="default"
             size="large"
             htmlType="button"
-            hidden={props.isButtonDisabled}
+            hidden={props.isButtonHidden}
             onClick={addItem}
           >
             Tambah Barang Baru
@@ -747,18 +640,18 @@ const ItemsTable = (props) => {
             </Popconfirm>
           </Col>
         </Col>
-        <Col offset="12">
-          <Form.Item style={{ marginBottom: 0 }}>
-            <Button
-              type="primary"
-              size="large"
-              htmlType="submit"
-              hidden={props.isButtonDisabled}
-            >
-              Generate
-            </Button>
-          </Form.Item>
-        </Col>
+          <Col offset="12">
+            <Form.Item style={{ marginBottom: 0 }}>
+              <Button
+                type="primary"
+                size="large"
+                htmlType="submit"
+                hidden={props.isButtonHidden}
+              >
+                Generate
+              </Button>
+            </Form.Item>
+          </Col>
       </Row>
     </>
   );
