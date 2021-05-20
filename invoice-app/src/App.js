@@ -1,12 +1,15 @@
 import "./App.css";
 import { Row, Col, Card, Radio } from "antd";
 import { useReactToPrint } from "react-to-print";
-import { useState, useRef, useReducer } from "react";
+import React, { useState, useRef, useReducer } from "react";
 import moment from "moment";
-import InvoiceForm from "./form.js";
+import InvoiceForm from "./invoiceForm.js";
 import { InvoiceToPrint, invoiceStyle } from "./invoice.js";
-import reducer from "./reducer.js";
-import { Receipt } from "./receipt.js";
+import { ReceiptToPrint, receiptStyle} from "./receipt.js";
+import { invoiceReducer, receiptReducer } from "./reducer.js";
+import { Receipt } from "./receiptForm.js";
+
+const ReceiptContext = React.createContext();
 
 const App = () => {
   const defaultInvoiceState = {
@@ -38,13 +41,30 @@ const App = () => {
     },
   };
 
+  const defaultReceiptState = {
+    data: {
+      name: "",
+      receiptNumber: "",
+      date: moment(new Date()).format("DD-MM-YYYY"),
+      giroNumber: "",
+      amount: "",
+      amountWritten: "",
+      matter: "",
+    },
+  };
+
   const [formState, setFormState] = useState("faktur");
   const [invoiceState, invoiceDispatch] = useReducer(
-    reducer,
+    invoiceReducer,
     defaultInvoiceState
+  );
+  const [receiptState, receiptDispatch] = useReducer(
+    receiptReducer,
+    defaultReceiptState
   );
 
   const invoiceToPrint = useRef();
+  const receiptToPrint = useRef();
 
   const changeForm = (e) => {
     const newOption = e.target.value;
@@ -54,26 +74,31 @@ const App = () => {
     invoiceDispatch({ type: "CHANGE_FORM", payload: newOption });
   };
 
-  const handleFinish = useReactToPrint({
-    content: () => invoiceToPrint.current,
-    pageStyle: invoiceStyle,
-  });
-
-  const isButtonHidden = () => {
-    return (
-      Math.ceil(invoiceState.data.length / invoiceState.pagination.pageSize) !==
-        invoiceState.pagination.current && formState === "faktur"
-    );
-  };
+  const handleFinish = useReactToPrint(
+    formState !== "kwitansi"
+      ? {
+          content: () => invoiceToPrint.current,
+          pageStyle: invoiceStyle,
+        }
+      :
+      {
+          content: () => receiptToPrint.current,
+          pageStyle: receiptStyle,
+        }
+  );
 
   return (
     <>
       <div style={{ overflow: "hidden", height: 0 }}>
-        <InvoiceToPrint
-          ref={invoiceToPrint}
-          state={invoiceState}
-          formState={formState}
-        />
+        {formState !== "kwitansi" 
+        ? (
+          <InvoiceToPrint
+            ref={invoiceToPrint}
+            state={invoiceState}
+            formState={formState}
+          />
+        ) 
+        : <ReceiptToPrint ref={receiptToPrint} state={receiptState}/>}
       </div>
       <Row style={{ marginTop: "1vw" }}>
         <Col offset="4">
@@ -104,10 +129,15 @@ const App = () => {
                 state={invoiceState}
                 dispatch={invoiceDispatch}
                 formState={formState}
-                isButtonHidden={isButtonHidden}
               />
             ) : (
-              <Receipt />
+              <ReceiptContext.Provider value={{ 
+                receiptState, 
+                receiptDispatch, 
+                handleFinish }}
+              >
+                <Receipt />
+              </ReceiptContext.Provider>
             )}
           </Card>
         </Col>
@@ -116,4 +146,4 @@ const App = () => {
   );
 };
 
-export default App;
+export {App, ReceiptContext};

@@ -9,7 +9,7 @@ const invoiceStyle = `
       font-family: "Trebuchet MS";
     }
       @page { 
-      size: 21.59cm 13.97cm portrait;
+      size: 21.59cm 13.97cm;
     } 
     .numeric{
       text-align:right;
@@ -19,6 +19,11 @@ const invoiceStyle = `
       page-break-after: always;
       display: block;
     }
+
+    #title{
+      text-align: center;
+    }
+
     .invoice{
       font-size: 0.7em;
     }
@@ -332,9 +337,9 @@ const TableItems = (props) => {
             <td>
               {numberWithCommas(
                 props.state.buyerInfo.subtotal -
-                  (props.state.buyerInfo.subtotal *
+                  parseInt((props.state.buyerInfo.subtotal *
                     props.state.buyerInfo.discount) /
-                    100
+                    100)
               )}
             </td>
           </tr>

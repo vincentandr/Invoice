@@ -1,153 +1,215 @@
-import { Button, Form, Input, DatePicker, Row, Col } from "antd";
+import React from "react";
+import logo_rotated from "./assets/logo_with_text_rotated.png";
+import {Row, Col, Layout, Space} from "antd";
 
-const Receipt = () => {
-  return (
-    <div id="kwitansi">
-      <Form layout="vertical" scrollToFirstError>
-        <Row>
-          <Col>
-            <PayerName />
-          </Col>
-          <Col>
-            <ReceiptNumber />
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <ReceiptDate />
-          </Col>
-          <Col>
-            <GiroNumber />
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <Amount />
-          </Col>
-        </Row>
-        <Row>
-          <Matter />
-        </Row>
-        <Row>
-          <Col>
-            <SubmitButton />
-          </Col>
-        </Row>
-      </Form>
-    </div>
-  );
-};
+const {Header, Sider, Content} = Layout;
 
-const PayerName = () => {
-  return (
-    <Form.Item
-      name="payer"
-      label="Nama Pembayar"
-      rules={[
-        {
-          required: true,
-          message: "Nama pembayar tidak boleh kosong",
-        },
-      ]}
-    >
-      <Input />
-    </Form.Item>
-  );
-};
+const receiptStyle = `
+    @media print{
+      html *{
+        font-family: "Trebuchet MS";
+      }
+      
+      @page { 
+        size: 21.59cm 13.97cm;
+      }
 
-const ReceiptNumber = () => {
-  return (
-    <Form.Item
-      name="receiptNumber"
-      label="Nomor Kwitansi"
-      rules={[
-        {
-          required: true,
-          message: "Nomor kwitansi tidak boleh kosong",
-        },
-      ]}
-    >
-      <Input />
-    </Form.Item>
-  );
-};
+      h1 {
+        font-size: 2em;
+      }
 
-const ReceiptDate = () => {
-  return (
-    <Form.Item
-      name="date"
-      label="Tanggal"
-      rules={[
-        {
-          required: true,
-          message: "Tanggal tidak boleh kosong",
-        },
-      ]}
-    >
-      <DatePicker />
-    </Form.Item>
-  );
-};
+      #logo{
+        position: absolute;
+        bottom: 5%;
+        text-align: center; 
+        left: 30%;
+      }
 
-const GiroNumber = () => {
-  return (
-    <Form.Item
-      name="giroNumber"
-      label="Nomor cek / giro"
-      rules={[
-        {
-          required: true,
-          message: "Nomor cek / giro tidak boleh kosong",
-        },
-      ]}
-    >
-      <Input />
-    </Form.Item>
-  );
-};
+      .field {
+        border-bottom: solid 2px black;
+      }
 
-const Amount = () => {
-  return (
-    <Form.Item
-      name="amount"
-      label="Jumlah Uang"
-      rules={[
-        {
-          required: true,
-          message: "Jumlah uang tidak boleh kosong",
-        },
-      ]}
-    >
-      <Input />
-    </Form.Item>
-  );
-};
+      #textarea{
+        position: absolute;
+        word-wrap: break-word;
+        word-break: break-all;
+        line-height: 2.1em;
+        top: -1mm;
+      }
 
-const Matter = () => {
-  return (
-    <Form.Item
-      name="matter"
-      label="Untuk Kepentingan"
-      rules={[
-        {
-          required: true,
-          message: "Kepentingan tidak boleh kosong",
-        },
-      ]}
-    >
-      <Input />
-    </Form.Item>
-  );
-};
+      .footer{
+        font-size: 0.8em;
+      }
+    }
+`;
 
-const SubmitButton = () => {
-  return (
-    <Form.Item style={{ marginBottom: 0 }}>
-      <Button type="primary" size="large" htmlType="submit">
-        Generate
-      </Button>
-    </Form.Item>
-  );
-};
+// const setTextareaString = (text) => {
+//   var textareas = document.getElementsByClassName("textarea");
 
-export { Receipt };
+//   if(textareas !== undefined && text.length > 0 && textareas.length > 0){
+//     var words = text.split(" ");
+
+//     for(var i=0;i<3;i++){
+//       textareas[i].innerHTML = "&nbsp;";
+//     }
+
+//     for(var i=0, j=0, count=0; i<words.length;i++){
+//       if(words[i].length <= 37){
+//         count += words[i].length + 1;
+
+//         if(count > 45){
+//           count = words[i].length;
+//           j++;
+//         }
+
+//         textareas[j].append(words[i] + " ");
+//       }else{
+//         var splits = words[i].match(/.{1,37}/g);
+
+//         for(var k=0;k<splits.length;k++){
+//           if(count > 0){
+//             j++;
+//           }
+
+//           textareas[j+k].append(splits[k] + " ");
+//         }
+//       }
+//     }
+//   }
+// }
+
+class ReceiptToPrint extends React.PureComponent {
+  render() {
+      // setTextareaString(this.props.state.data.matter);
+      return (
+        <Layout
+          style={{
+            backgroundColor: "transparent",
+            height: "99%",
+            fontSize: "1.2em",
+          }}
+        >
+          <Sider
+            width="20%"
+            style={{
+              backgroundColor: "transparent",
+              border: "solid 4px black",
+              borderStyle: "double",
+            }}
+          >
+            <div id="logo">
+              <img
+                src={logo_rotated}
+                alt="logo"
+              />
+            </div>
+          </Sider>
+          <Layout
+            style={{
+              backgroundColor: "transparent",
+              border: "solid 1px black",
+            }}
+          >
+            <Header
+              style={{
+                backgroundColor: "transparent",
+                border: "solid 1px black",
+              }}
+            >
+              <h1>Kwitansi</h1>
+            </Header>
+
+            <Content
+              style={{
+                backgroundColor: "transparent",
+                border: "solid 1px black",
+                height: "40%",
+              }}
+            >
+              <Space
+                direction="vertical"
+                size="small"
+                style={{ width: "100%" }}
+              >
+                <Row style={{ marginTop: "1em" }}>
+                  <Col span="6" offset="1">
+                    No. kwitansi
+                  </Col>
+                  <Col span="1">:</Col>
+                  <Col className="field" span="14">
+                    {this.props.state.data.receiptNumber}
+                  </Col>
+                </Row>
+                <Row align="bottom">
+                  <Col span="6" offset="1">
+                    Sudah terima dari
+                  </Col>
+                  <Col span="1">:</Col>
+                  <Col className="field" span="14">
+                    {this.props.state.data.name}
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span="6" offset="1">
+                    Banyaknya uang
+                  </Col>
+                  <Col span="1">:</Col>
+                  <Col className="field" span="14">
+                    {this.props.state.data.amountWritten}
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span="6" offset="1">
+                    Untuk pembayaran
+                  </Col>
+                  <Col span="1">:</Col>
+                  <Col className="field " span="14">
+                    <div id="textarea">
+                      {this.props.state.data.matter}
+                    </div>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col className="field textarea" offset="8" span="14">
+                    &nbsp;
+                  </Col>
+                </Row>
+                <Row>
+                  <Col className="field textarea" offset="8" span="14">
+                    &nbsp;
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>&nbsp;</Col>
+                </Row>
+                <Row>
+                  <Col className="field" offset="15" span="7" style={{textAlign: "center"}}>
+                    {this.props.state.data.date}
+                  </Col>
+                </Row>
+                <Row className="footer">
+                  <Col offset="1" span="4">
+                    Cek / Giro No.
+                  </Col>
+                  <Col className="field" span="8">
+                    {this.props.state.data.giroNumber}
+                  </Col>
+                </Row>
+                <Row className="footer">
+                  <Col offset="1" span="4">
+                    Jumlah
+                  </Col>
+                  <Col className="field" span="8">
+                    Rp.&nbsp;{this.props.state.data.amount}
+                  </Col>
+                  <Col className="field" offset="16" span="5"></Col>
+                </Row>
+              </Space>
+            </Content>
+          </Layout>
+        </Layout>
+      );
+  }
+}
+
+export {ReceiptToPrint, receiptStyle};

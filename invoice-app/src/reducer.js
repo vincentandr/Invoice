@@ -1,6 +1,6 @@
 import { calculateSubtotal } from "./util.js";
 
-const reducer = (state, action) => {
+const invoiceReducer = (state, action) => {
   switch (action.type) {
     case "ADD_ITEM": {
       let newItem = action.payload;
@@ -126,4 +126,20 @@ const reducer = (state, action) => {
   }
 };
 
-export default reducer;
+const receiptReducer = (state, action) => {
+  switch (action.type) {
+    case "UPDATE_FORM_INPUT_VALUE":
+      const newVal = action.payload.value;
+      const name = action.payload.name;
+
+      let dataCopy = { ...state.data };
+
+      dataCopy[name] = newVal;
+
+      return { ...state, data: dataCopy };
+    default:
+      throw new Error("No matching case found");
+  }
+};
+
+export { invoiceReducer, receiptReducer };

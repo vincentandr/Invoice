@@ -10,7 +10,7 @@ import {
 } from "antd";
 import NumberFormat from "react-number-format";
 import moment from "moment";
-import { numberWithCommas, getFieldsOnTable  } from "./util.js";
+import { numberWithCommas, getFieldsOnTable } from "./util.js";
 
 const InvoiceForm = (props) => {
   const [form] = Form.useForm();
@@ -323,7 +323,7 @@ const ItemsTable = (props) => {
 
   var columns = [];
 
-  if (props.formState === "faktur")   {
+  if (props.formState === "faktur") {
     columns = [
       {
         title: props.state.columns[0],
@@ -390,7 +390,7 @@ const ItemsTable = (props) => {
           ) : null,
       },
     ];
-  } else if   (props.formState === "surat")   {
+  } else if (props.formState === "surat") {
     columns = [
       {
         title: props.state.columns[0],
@@ -505,6 +505,13 @@ const ItemsTable = (props) => {
       });
   };
 
+  const isButtonHidden = () => {
+    return (
+      Math.ceil(props.state.data.length / props.state.pagination.pageSize) !==
+        props.state.pagination.current && props.formState !== "kwitansi"
+    );
+  };
+
   return (
     <>
       <Row>
@@ -600,9 +607,11 @@ const ItemsTable = (props) => {
                             isNaN(props.state.buyerInfo.subtotal)
                               ? 0
                               : props.state.buyerInfo.subtotal -
-                                (props.state.buyerInfo.subtotal *
-                                  props.state.buyerInfo.discount) /
-                                  100
+                                parseInt(
+                                  (props.state.buyerInfo.subtotal *
+                                    props.state.buyerInfo.discount) /
+                                    100
+                                )
                           }
                         />
                       </Col>
@@ -620,7 +629,7 @@ const ItemsTable = (props) => {
             type="default"
             size="large"
             htmlType="button"
-            hidden={props.isButtonHidden}
+            hidden={isButtonHidden()}
             onClick={addItem}
           >
             Tambah Barang Baru
@@ -640,18 +649,18 @@ const ItemsTable = (props) => {
             </Popconfirm>
           </Col>
         </Col>
-          <Col offset="12">
-            <Form.Item style={{ marginBottom: 0 }}>
-              <Button
-                type="primary"
-                size="large"
-                htmlType="submit"
-                hidden={props.isButtonHidden}
-              >
-                Generate
-              </Button>
-            </Form.Item>
-          </Col>
+        <Col offset="12">
+          <Form.Item style={{ marginBottom: 0 }}>
+            <Button
+              type="primary"
+              size="large"
+              htmlType="submit"
+              hidden={isButtonHidden()}
+            >
+              Generate
+            </Button>
+          </Form.Item>
+        </Col>
       </Row>
     </>
   );
