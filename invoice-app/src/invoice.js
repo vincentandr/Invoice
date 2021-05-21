@@ -9,7 +9,7 @@ const invoiceStyle = `
       font-family: "Trebuchet MS";
     }
       @page { 
-      size: 21.59cm 13.97cm;
+      size: 21cm 13.97cm;
     } 
     .numeric{
       text-align:right;

@@ -1,5 +1,6 @@
 import React from "react";
 import logo_rotated from "./assets/logo_with_text_rotated.png";
+import { numberWithCommas } from "./util.js";
 import {Row, Col, Layout, Space} from "antd";
 
 const {Header, Sider, Content} = Layout;
@@ -22,7 +23,8 @@ const receiptStyle = `
         position: absolute;
         bottom: 5%;
         text-align: center; 
-        left: 30%;
+        left: 0;
+        right: 0;
       }
 
       .field {
@@ -98,10 +100,7 @@ class ReceiptToPrint extends React.PureComponent {
             }}
           >
             <div id="logo">
-              <img
-                src={logo_rotated}
-                alt="logo"
-              />
+              <img src={logo_rotated} alt="logo" />
             </div>
           </Sider>
           <Layout
@@ -164,9 +163,7 @@ class ReceiptToPrint extends React.PureComponent {
                   </Col>
                   <Col span="1">:</Col>
                   <Col className="field " span="14">
-                    <div id="textarea">
-                      {this.props.state.data.matter}
-                    </div>
+                    <div id="textarea">{this.props.state.data.matter}</div>
                   </Col>
                 </Row>
                 <Row>
@@ -183,7 +180,12 @@ class ReceiptToPrint extends React.PureComponent {
                   <Col>&nbsp;</Col>
                 </Row>
                 <Row>
-                  <Col className="field" offset="15" span="7" style={{textAlign: "center"}}>
+                  <Col
+                    className="field"
+                    offset="15"
+                    span="7"
+                    style={{ textAlign: "center" }}
+                  >
                     {this.props.state.data.date}
                   </Col>
                 </Row>
@@ -200,7 +202,7 @@ class ReceiptToPrint extends React.PureComponent {
                     Jumlah
                   </Col>
                   <Col className="field" span="8">
-                    Rp.&nbsp;{this.props.state.data.amount}
+                    Rp.&nbsp;{numberWithCommas(this.props.state.data.amount)}
                   </Col>
                   <Col className="field" offset="16" span="5"></Col>
                 </Row>

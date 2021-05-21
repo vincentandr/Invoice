@@ -1,5 +1,7 @@
 import { Button, Form, Input, DatePicker, Row, Col } from "antd";
 import { useContext } from "react";
+import { numberWithCommas } from "./util.js";
+import NumberFormat from "react-number-format";
 import { ReceiptContext } from "./App.js";
 import moment from "moment";
 
@@ -184,16 +186,21 @@ const Amount = () => {
       ]}
       initialValue={context.receiptState.data.amount}
     >
-      <Input
-        onBlur={(e) =>
+      <NumberFormat
+        format={numberWithCommas}
+        displayType="input"
+        customInput={Input}
+        style={{ width: "100%"  }}
+        onValueChange={(values) => {
+          const { value } = values;
           context.receiptDispatch({
             type: "UPDATE_FORM_INPUT_VALUE",
             payload: {
+              value: parseInt(value),
               name: "amount",
-              value: e.target.value,
             },
-          })
-        }
+          });
+        }}
       />
     </Form.Item>
   );
