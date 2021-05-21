@@ -131,50 +131,50 @@ class ReceiptToPrint extends React.PureComponent {
                 style={{ width: "100%" }}
               >
                 <Row style={{ marginTop: "1em" }}>
-                  <Col span="6" offset="1">
+                  <Col span="5" offset="1">
                     No. kwitansi
                   </Col>
                   <Col span="1">:</Col>
-                  <Col className="field" span="14">
+                  <Col className="field" span="15">
                     {this.props.state.data.receiptNumber}
                   </Col>
                 </Row>
                 <Row align="bottom">
-                  <Col span="6" offset="1">
+                  <Col span="5" offset="1">
                     Sudah terima dari
                   </Col>
                   <Col span="1">:</Col>
-                  <Col className="field" span="14">
+                  <Col className="field" span="15">
                     {this.props.state.data.name}
                   </Col>
                 </Row>
                 <Row>
-                  <Col span="6" offset="1">
+                  <Col span="5" offset="1">
                     Banyaknya uang
                   </Col>
                   <Col span="1">:</Col>
-                  <Col className="field" span="14">
+                  <Col className="field" span="15">
                     <div id="textarea">
                       {this.props.state.data.amountWritten}
                     </div>
                   </Col>
                 </Row>
                 <Row>
-                  <Col className="field" offset="8" span="14">
+                  <Col className="field" offset="7" span="15">
                     &nbsp;
                   </Col>
                 </Row>
                 <Row>
-                  <Col span="6" offset="1">
+                  <Col span="5" offset="1">
                     Untuk pembayaran
                   </Col>
                   <Col span="1">:</Col>
-                  <Col className="field" span="14">
+                  <Col className="field" span="15">
                     <div id="textarea">{this.props.state.data.matter}</div>
                   </Col>
                 </Row>
                 <Row>
-                  <Col className="field" offset="8" span="14">
+                  <Col className="field" offset="7" span="15">
                     &nbsp;
                   </Col>
                 </Row>
@@ -184,7 +184,7 @@ class ReceiptToPrint extends React.PureComponent {
                   style={{ width: "100%" }}
                 >
                   <Row>
-                    <Col className="field" offset="8" span="14">
+                    <Col className="field" offset="7" span="15">
                       &nbsp;
                     </Col>
                   </Row>
@@ -206,7 +206,7 @@ class ReceiptToPrint extends React.PureComponent {
                   <Col offset="1" span="4">
                     Cek / Giro No.
                   </Col>
-                  <Col className="field" span="8">
+                  <Col className="field" span="6">
                     {this.props.state.data.giroNumber}
                   </Col>
                 </Row>
@@ -214,7 +214,7 @@ class ReceiptToPrint extends React.PureComponent {
                   <Col offset="1" span="4">
                     Jumlah
                   </Col>
-                  <Col className="field" span="8">
+                  <Col className="field" span="6">
                     Rp.&nbsp;{numberWithCommas(this.props.state.data.amount)}
                   </Col>
                   <Col className="field" offset="16" span="5"></Col>
