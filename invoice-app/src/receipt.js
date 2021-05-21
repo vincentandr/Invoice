@@ -9,6 +9,7 @@ const receiptStyle = `
     @media print{
       html *{
         font-family: "Trebuchet MS";
+        font-size: 0.97em;
       }
       
       @page { 
@@ -21,7 +22,7 @@ const receiptStyle = `
 
       #logo{
         position: absolute;
-        bottom: 5%;
+        bottom: 7%;
         text-align: center; 
         left: 0;
         right: 0;
@@ -34,7 +35,6 @@ const receiptStyle = `
       #textarea{
         position: absolute;
         word-wrap: break-word;
-        word-break: break-all;
         line-height: 2.1em;
         top: -1mm;
       }
@@ -92,7 +92,7 @@ class ReceiptToPrint extends React.PureComponent {
           }}
         >
           <Sider
-            width="20%"
+            width="15%"
             style={{
               backgroundColor: "transparent",
               border: "solid 4px black",
@@ -154,7 +154,14 @@ class ReceiptToPrint extends React.PureComponent {
                   </Col>
                   <Col span="1">:</Col>
                   <Col className="field" span="14">
-                    {this.props.state.data.amountWritten}
+                    <div id="textarea">
+                      {this.props.state.data.amountWritten}
+                    </div>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col className="field" offset="8" span="14">
+                    &nbsp;
                   </Col>
                 </Row>
                 <Row>
@@ -162,32 +169,38 @@ class ReceiptToPrint extends React.PureComponent {
                     Untuk pembayaran
                   </Col>
                   <Col span="1">:</Col>
-                  <Col className="field " span="14">
+                  <Col className="field" span="14">
                     <div id="textarea">{this.props.state.data.matter}</div>
                   </Col>
                 </Row>
                 <Row>
-                  <Col className="field textarea" offset="8" span="14">
+                  <Col className="field" offset="8" span="14">
                     &nbsp;
                   </Col>
                 </Row>
-                <Row>
-                  <Col className="field textarea" offset="8" span="14">
-                    &nbsp;
-                  </Col>
-                </Row>
+                <Space
+                  direction="vertical"
+                  size="large"
+                  style={{ width: "100%" }}
+                >
+                  <Row>
+                    <Col className="field" offset="8" span="14">
+                      &nbsp;
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col
+                      className="field"
+                      offset="16"
+                      span="5"
+                      style={{ textAlign: "center" }}
+                    >
+                      {this.props.state.data.date}
+                    </Col>
+                  </Row>
+                </Space>
                 <Row>
                   <Col>&nbsp;</Col>
-                </Row>
-                <Row>
-                  <Col
-                    className="field"
-                    offset="15"
-                    span="7"
-                    style={{ textAlign: "center" }}
-                  >
-                    {this.props.state.data.date}
-                  </Col>
                 </Row>
                 <Row className="footer">
                   <Col offset="1" span="4">

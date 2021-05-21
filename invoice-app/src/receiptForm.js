@@ -252,7 +252,7 @@ const Matter = () => {
       initialValue={context.receiptState.data.matter}
     >
       <Input.TextArea
-        maxLength={40 * 3}
+        maxLength={150}
         onBlur={(e) =>
           context.receiptDispatch({
             type: "UPDATE_FORM_INPUT_VALUE",
