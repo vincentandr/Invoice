@@ -623,8 +623,8 @@ const ItemsTable = (props) => {
           />
         </Col>
       </Row>
-      <Row justify="start">
-        <Col>
+      <Row>
+        <Col offset="1" span="4">
           <Button
             type="default"
             size="large"
@@ -636,7 +636,7 @@ const ItemsTable = (props) => {
           </Button>
         </Col>
         <Col>
-          <Col offset="3">
+          <Col offset="6" span="6">
             <Popconfirm
               title="Yakin ingin hapus semua barang?"
               onConfirm={removeAll}
@@ -649,7 +649,7 @@ const ItemsTable = (props) => {
             </Popconfirm>
           </Col>
         </Col>
-        <Col offset="12">
+        <Col offset="11">
           <Form.Item style={{ marginBottom: 0 }}>
             <Button
               type="primary"
