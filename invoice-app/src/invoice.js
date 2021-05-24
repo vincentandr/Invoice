@@ -97,7 +97,7 @@ const invoiceStyle = `
         display: flex;
         position:fixed;
         bottom: 0;
-        left: 30%;
+        left: 25%;
         text-align:center;
       }
       .sign:nth-child(2){
@@ -143,9 +143,12 @@ class InvoiceToPrint extends React.PureComponent {
             pageCount={pageCount}
           />
           <BuyerCompany {...this.props.state.buyerInfo} />
-          <Dates {...this.props.state.buyerInfo} formState={this.props.formState} />
+          <Dates
+            {...this.props.state.buyerInfo}
+            formState={this.props.formState}
+          />
           <TableItems {...this.props} start={startIndex} end={endIndex} />
-          <Footer {...this.props.state} />
+          <Footer {...this.props.state} formState={this.props.formState} />
         </div>
       );
     }
@@ -362,7 +365,9 @@ const Footer = (props) => {
   return (
     <footer>
       <SignArea person="Penerima" />
-      <SignArea person={props.formState === "faktur" ? "Penjual" : "Hormat kami"} />
+      <SignArea
+        person={props.formState === "faktur" ? "Penjual" : "Hormat kami"}
+      />
       <SignArea person="Checklist" />
     </footer>
   );
