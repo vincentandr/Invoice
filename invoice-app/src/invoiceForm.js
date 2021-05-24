@@ -624,32 +624,32 @@ const ItemsTable = (props) => {
         </Col>
       </Row>
       <Row>
-        <Col offset="1" span="4">
-          <Button
-            type="default"
-            size="large"
-            htmlType="button"
-            hidden={isButtonHidden()}
-            onClick={addItem}
+        <Col offset="1">
+          <Popconfirm
+            title="Yakin ingin hapus semua barang?"
+            onConfirm={removeAll}
+            okText="Yes"
+            cancelText="No"
           >
-            Tambah Barang Baru
-          </Button>
+            <Button type="default" size="large" htmlType="button" danger>
+              Hapus Semua Barang
+            </Button>
+          </Popconfirm>
         </Col>
-        <Col>
-          <Col offset="6" span="6">
-            <Popconfirm
-              title="Yakin ingin hapus semua barang?"
-              onConfirm={removeAll}
-              okText="Yes"
-              cancelText="No"
+        <Col span="4" offset="1">
+          <Col>
+            <Button
+              type="default"
+              size="large"
+              htmlType="button"
+              hidden={isButtonHidden()}
+              onClick={addItem}
             >
-              <Button type="default" size="large" htmlType="button" danger>
-                Hapus Semua Barang
-              </Button>
-            </Popconfirm>
+              Tambah Barang Baru
+            </Button>
           </Col>
         </Col>
-        <Col offset="11">
+        <Col offset="10">
           <Form.Item style={{ marginBottom: 0 }}>
             <Button
               type="primary"
