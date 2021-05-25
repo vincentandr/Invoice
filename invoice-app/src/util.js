@@ -12,7 +12,27 @@ const getFieldsOnTable = (fields) => {
 };
 
 const calculateSubtotal = (data) => {
-  return data.reduce((sum, item) => sum + item.qty * item.price, 0);
+  return parseInt(data.reduce((sum, item) => sum + item.qty * item.price, 0));
 };
 
-export { numberWithCommas, getFieldsOnTable, calculateSubtotal };
+const calculateDiscount = (data, discount) => {
+  let discountedItems = data.filter((item) => item.discount === true);
+
+  if (discountedItems.length > 0) {
+    return parseInt(
+      discountedItems.reduce(
+        (sum, item) => sum + (item.qty * item.price * discount) / 100,
+        0
+      )
+    );
+  }
+
+  return 0;
+};
+
+export {
+  numberWithCommas,
+  getFieldsOnTable,
+  calculateSubtotal,
+  calculateDiscount,
+};
