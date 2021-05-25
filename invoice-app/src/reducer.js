@@ -1,4 +1,4 @@
-import { calculateSubtotal } from "./util.js";
+import { calculateSubtotal, calculateDiscount } from "./util.js";
 
 const invoiceReducer = (state, action) => {
   switch (action.type) {
@@ -31,8 +31,6 @@ const invoiceReducer = (state, action) => {
         newItems[i].id = newItems[i].id - 1;
       }
 
-      let subtotal = calculateSubtotal(newItems);
-
       let current = state.pagination.current;
 
       // redirect to previous page if the deleted item is the first and only item of last page
@@ -45,7 +43,6 @@ const invoiceReducer = (state, action) => {
         ...state,
         data: newItems,
         pagination: { ...state.pagination, current: current },
-        buyerInfo: { ...state.buyerInfo, subtotal: subtotal },
       };
     }
     case "REMOVE_ALL": {
@@ -57,11 +54,12 @@ const invoiceReducer = (state, action) => {
             count: 1,
             code: "",
             name: "",
+            discount: false,
             qty: 1,
             price: 0,
           },
         ],
-        buyerInfo: { ...state.buyerInfo, subtotal: 0 },
+        buyerInfo: { ...state.buyerInfo, subtotal: 0, totalDiscount: 0 },
         pagination: {
           ...state.pagination,
           current: 1,
@@ -75,6 +73,12 @@ const invoiceReducer = (state, action) => {
       let dataCopy = { ...state.buyerInfo };
 
       dataCopy[name] = newVal;
+
+      if(name === "discount"){
+        dataCopy["totalDiscount"] = calculateDiscount(state.data, newVal)
+
+        console.log(dataCopy["totalDiscount"]);
+      }
 
       return {
         ...state,
@@ -96,10 +100,15 @@ const invoiceReducer = (state, action) => {
 
       let subtotal = calculateSubtotal(dataCopy);
 
+      let totalDiscount = calculateDiscount(dataCopy, state.buyerInfo.discount);
+
       return {
         ...state,
         data: [...dataCopy],
-        buyerInfo: { ...state.buyerInfo, subtotal: subtotal },
+        buyerInfo: { 
+          ...state.buyerInfo,
+          subtotal: subtotal,
+          totalDiscount: totalDiscount },
       };
     }
     case "CHANGE_PAGE":
@@ -114,7 +123,7 @@ const invoiceReducer = (state, action) => {
       // If changing form to faktur then printed table columns are adjusted
       var columns =
         newOption === "faktur"
-          ? ["No.", "Kode Barang", "Nama Barang", "Qty", "Harga", "Total"]
+          ? ["No.", "Kode Barang", "Nama Barang", "Disc.", "Qty", "Harga", "Total"]
           : ["No.", "Kode Barang", "Nama Barang", "Qty"];
 
       return {
@@ -143,3 +152,7 @@ const receiptReducer = (state, action) => {
 };
 
 export { invoiceReducer, receiptReducer };
+
+                                
+                                
+                                

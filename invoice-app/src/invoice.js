@@ -227,7 +227,8 @@ const TableItems = (props) => {
         <colgroup>
           <col span="1" style={{ width: "5%" }} />
           <col span="1" style={{ width: "20%" }} />
-          <col span="1" style={{ width: "45%" }} />
+          <col span="1" style={{ width: "40%" }} />
+          <col span="1" style={{ width: "5%" }} />
           <col span="1" style={{ width: "5%" }} />
           <col span="1" style={{ width: "10%" }} />
           <col span="1" style={{ width: "15%" }} />
@@ -264,9 +265,11 @@ const TableItems = (props) => {
                 if (
                   column !== "count" &&
                   ((column !== "price" &&
-                  props.formState === "surat") || props.formState === "faktur")
+                    column !== "discount" &&
+                    props.formState === "surat") ||
+                    props.formState === "faktur")
                 )
-                // Column based on keys of data object
+                  // Column based on keys of data object
                   return (
                     <td
                       key={innerIndex}
@@ -282,6 +285,13 @@ const TableItems = (props) => {
                         />
                       ) : column === "qty" && isNaN(item[column]) ? (
                         0
+                      ) : column === "discount" ? (
+                        item.discount &&
+                        props.state.buyerInfo.discount !== 0 ? (
+                          `${props.state.buyerInfo.discount}%`
+                        ) : (
+                          "-"
+                        )
                       ) : (
                         item[column]
                       )}
@@ -311,45 +321,33 @@ const TableItems = (props) => {
       </tbody>
       <tfoot>
         {/* Subtotal, Discount, Grand total, Note only on faktur */}
-        { props.formState === "faktur" && 
+        {props.formState === "faktur" && (
           <>
-          <tr className="numeric" id="subtotal">
-            <td colSpan="5">
-              Subtotal
-            </td>
-            <td>{numberWithCommas(props.state.buyerInfo.subtotal)}</td>
-          </tr>
-          <tr className="numeric" id="discount">
-            <td colSpan="5">
-              {`Discount (${numberWithCommas(
-              props.state.buyerInfo.discount
-            )}%)`}
-            </td>
-            <td>
-              {numberWithCommas(
-                (props.state.buyerInfo.subtotal *
-                  props.state.buyerInfo.discount) /
-                  100
-              )}
-            </td>
-          </tr>
-          <tr className="numeric" id="grandTotal">
-            <td colSpan="5">
-              Grand total
-            </td>
-            <td>
-              {numberWithCommas(
-                props.state.buyerInfo.subtotal -
-                  parseInt((props.state.buyerInfo.subtotal *
-                    props.state.buyerInfo.discount) /
-                    100)
-              )}
-            </td>
-          </tr>
+            <tr className="numeric" id="subtotal">
+              <td colSpan="6">Subtotal</td>
+              <td>{numberWithCommas(props.state.buyerInfo.subtotal)}</td>
+            </tr>
+            <tr className="numeric" id="discount">
+              <td colSpan="6">
+                {`Discount (${numberWithCommas(
+                  props.state.buyerInfo.discount
+                )}%)`}
+              </td>
+              <td>{numberWithCommas(props.state.buyerInfo.totalDiscount)}</td>
+            </tr>
+            <tr className="numeric" id="grandTotal">
+              <td colSpan="6">Grand total</td>
+              <td>
+                {numberWithCommas(
+                  parseInt(props.state.buyerInfo.subtotal) -
+                    parseInt(props.state.buyerInfo.totalDiscount)
+                )}
+              </td>
+            </tr>
           </>
-        }
+        )}
         <tr>
-          <td colSpan={props.formState === "faktur" ? 6 : 4}>
+          <td colSpan={props.formState === "faktur" ? 7 : 4}>
             <div id="note">
               Keterangan:&nbsp;
               {props.state.buyerInfo.note}

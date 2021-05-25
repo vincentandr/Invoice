@@ -6,6 +6,7 @@ import {
   Row,
   Col,
   Popconfirm,
+  Checkbox,
   Table,
 } from "antd";
 import NumberFormat from "react-number-format";
@@ -279,6 +280,32 @@ const EditableCell = ({
           />
         </Form.Item>
       );
+    } else if (dataIndex === "discount") {
+      childNode = (
+        <Form.Item
+          name={`${dataIndex}${index}`}
+          valuePropName="checked"
+          initialValue={state.data[index][dataIndex]}
+          preserve={false}
+          style={{ marginBottom: 0 }}
+        >
+          <Checkbox
+            disabled={state.buyerInfo.discount === 0 || isNaN(state.buyerInfo.discount)}
+            defaultChecked={state.data[index][dataIndex]}
+            style={{transform: "scale(1.5)" }}
+            onChange={(e) =>
+              dispatch({
+                type: "UPDATE_TABLE_INPUT_VALUE",
+                payload: {
+                  val: e.target.checked,
+                  index: index,
+                  column: dataIndex,
+                },
+              })
+            }
+          />
+        </Form.Item>
+      );
     } else {
       childNode = (
         <Form.Item
@@ -344,22 +371,29 @@ const ItemsTable = (props) => {
       },
       {
         title: props.state.columns[3],
+        dataIndex: "discount",
+        editable: true,
+        width: "5%",
+      },
+      {
+        title: props.state.columns[4],
         dataIndex: "qty",
         editable: true,
         width: "10%",
         align: "right",
       },
       {
-        title: props.state.columns[4],
+        title: props.state.columns[5],
         dataIndex: "price",
         editable: true,
         width: "15%",
         align: "right",
       },
       {
-        title: props.state.columns[5],
+        title: props.state.columns[6],
         dataIndex: "total",
         align: "right",
+        width: "15%",
         render: (text, _, index) => {
           let idx =
             index +
@@ -457,6 +491,7 @@ const ItemsTable = (props) => {
       count: props.state.data[props.state.data.length - 1].count + 1,
       code: "",
       name: "",
+      discount: false,
       qty: 1,
       price: 0,
     };
@@ -487,6 +522,7 @@ const ItemsTable = (props) => {
     props.form.setFieldsValue({
       code0: "",
       name0: "",
+      discount0: false,
       qty0: 1,
       price0: 0,
     });
@@ -583,13 +619,9 @@ const ItemsTable = (props) => {
                         <NumberFormat
                           displayType="text"
                           format={numberWithCommas}
-                          value={
-                            isNaN(props.state.buyerInfo.discount) ||
-                            isNaN(props.state.buyerInfo.subtotal)
-                              ? 0
-                              : (props.state.buyerInfo.subtotal *
-                                  props.state.buyerInfo.discount) /
-                                100
+                          value={isNaN(props.state.buyerInfo.totalDiscount) 
+                            ? 0
+                            : props.state.buyerInfo.totalDiscount
                           }
                         />
                       </Col>
@@ -603,15 +635,11 @@ const ItemsTable = (props) => {
                           displayType="text"
                           format={numberWithCommas}
                           value={
-                            isNaN(props.state.buyerInfo.discount) ||
+                            isNaN(props.state.buyerInfo.totalDiscount) ||
                             isNaN(props.state.buyerInfo.subtotal)
                               ? 0
                               : props.state.buyerInfo.subtotal -
-                                parseInt(
-                                  (props.state.buyerInfo.subtotal *
-                                    props.state.buyerInfo.discount) /
-                                    100
-                                )
+                                props.state.buyerInfo.totalDiscount
                           }
                         />
                       </Col>
