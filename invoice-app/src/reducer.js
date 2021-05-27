@@ -123,8 +123,17 @@ const invoiceReducer = (state, action) => {
       // If changing form to faktur then printed table columns are adjusted
       var columns =
         newOption === "faktur"
-          ? ["No.", "Kode Barang", "Nama Barang", "Disc.", "Qty", "Harga", "Total"]
-          : ["No.", "Kode Barang", "Nama Barang", "Qty"];
+          ? [
+              "No.",
+              "Kode Barang",
+              "Nama Barang",
+              "Disc.",
+              "Qty",
+              "Unit",
+              "Harga",
+              "Total",
+            ]
+          : ["No.", "Kode Barang", "Nama Barang", "Qty", "Unit"];
 
       return {
         ...state,
