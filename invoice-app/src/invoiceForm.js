@@ -8,10 +8,13 @@ import {
   Popconfirm,
   Checkbox,
   Table,
+  Select,
 } from "antd";
 import NumberFormat from "react-number-format";
 import moment from "moment";
 import { numberWithCommas, getFieldsOnTable } from "./util.js";
+
+const { Option } = Select;
 
 const InvoiceForm = (props) => {
   const [form] = Form.useForm();
@@ -306,6 +309,32 @@ const EditableCell = ({
           />
         </Form.Item>
       );
+    } else if (dataIndex === "unit"){
+      childNode = (
+        <Form.Item
+          name={`${dataIndex}${index}`}
+          initialValue={state.data[index][dataIndex]}
+          preserve={false}
+          style={{ marginBottom: 0 }}
+        >
+          <Select
+            defaultValue="buah"
+            onChange={(value) =>
+              dispatch({
+                type: "UPDATE_TABLE_INPUT_VALUE",
+                payload: {
+                  val: value,
+                  index: index,
+                  column: dataIndex,
+                },
+              })
+            }
+          >
+            <Option value="buah">buah</Option>
+            <Option value="set">set</Option>
+          </Select>
+        </Form.Item>
+      );
     } else {
       childNode = (
         <Form.Item
@@ -367,7 +396,7 @@ const ItemsTable = (props) => {
         title: props.state.columns[2],
         dataIndex: "name",
         editable: true,
-        width: "25%",
+        width: "20%",
       },
       {
         title: props.state.columns[3],
@@ -379,21 +408,26 @@ const ItemsTable = (props) => {
         title: props.state.columns[4],
         dataIndex: "qty",
         editable: true,
-        width: "10%",
+        width: "8%",
         align: "right",
       },
       {
         title: props.state.columns[5],
-        dataIndex: "price",
+        dataIndex: "unit",
         editable: true,
-        width: "15%",
-        align: "right",
+        width: "10%",
       },
       {
         title: props.state.columns[6],
+        dataIndex: "price",
+        editable: true,
+        width: "13%",
+      },
+      {
+        title: props.state.columns[7],
         dataIndex: "total",
         align: "right",
-        width: "15%",
+        width: "14%",
         render: (text, _, index) => {
           let idx =
             index +
@@ -449,6 +483,12 @@ const ItemsTable = (props) => {
         editable: true,
         width: "10%",
         align: "right",
+      },
+      {
+        title: props.state.columns[4],
+        dataIndex: "unit",
+        editable: true,
+        width: "10%",
       },
       {
         title: "Hapus",
@@ -619,9 +659,10 @@ const ItemsTable = (props) => {
                         <NumberFormat
                           displayType="text"
                           format={numberWithCommas}
-                          value={isNaN(props.state.buyerInfo.totalDiscount) 
-                            ? 0
-                            : props.state.buyerInfo.totalDiscount
+                          value={
+                            isNaN(props.state.buyerInfo.totalDiscount)
+                              ? 0
+                              : props.state.buyerInfo.totalDiscount
                           }
                         />
                       </Col>
@@ -652,7 +693,7 @@ const ItemsTable = (props) => {
         </Col>
       </Row>
       <Row>
-        <Col offset="1">
+        <Col offset="1" span="5">
           <Popconfirm
             title="Yakin ingin hapus semua barang?"
             onConfirm={removeAll}
@@ -664,7 +705,7 @@ const ItemsTable = (props) => {
             </Button>
           </Popconfirm>
         </Col>
-        <Col span="4" offset="1">
+        <Col span="5">
           <Col>
             <Button
               type="default"
@@ -677,7 +718,7 @@ const ItemsTable = (props) => {
             </Button>
           </Col>
         </Col>
-        <Col offset="10">
+        <Col offset="10" span="3">
           <Form.Item style={{ marginBottom: 0 }}>
             <Button
               type="primary"

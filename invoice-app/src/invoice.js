@@ -227,9 +227,10 @@ const TableItems = (props) => {
         <colgroup>
           <col span="1" style={{ width: "5%" }} />
           <col span="1" style={{ width: "20%" }} />
-          <col span="1" style={{ width: "40%" }} />
+          <col span="1" style={{ width: "35%" }} />
           <col span="1" style={{ width: "5%" }} />
           <col span="1" style={{ width: "5%" }} />
+          <col span="1" style={{ width: "10%" }} />
           <col span="1" style={{ width: "10%" }} />
           <col span="1" style={{ width: "15%" }} />
         </colgroup>
@@ -237,8 +238,9 @@ const TableItems = (props) => {
         <colgroup>
           <col span="1" style={{ width: "5%" }} />
           <col span="1" style={{ width: "20%" }} />
-          <col span="1" style={{ width: "70%" }} />
+          <col span="1" style={{ width: "60%" }} />
           <col span="1" style={{ width: "5%" }} />
+          <col span="1" style={{ width: "10%" }} />
         </colgroup>
       )}
       <thead>
@@ -324,11 +326,11 @@ const TableItems = (props) => {
         {props.formState === "faktur" && (
           <>
             <tr className="numeric" id="subtotal">
-              <td colSpan="6">Subtotal</td>
+              <td colSpan="7">Subtotal</td>
               <td>{numberWithCommas(props.state.buyerInfo.subtotal)}</td>
             </tr>
             <tr className="numeric" id="discount">
-              <td colSpan="6">
+              <td colSpan="7">
                 {`Discount (${numberWithCommas(
                   props.state.buyerInfo.discount
                 )}%)`}
@@ -336,7 +338,7 @@ const TableItems = (props) => {
               <td>{numberWithCommas(props.state.buyerInfo.totalDiscount)}</td>
             </tr>
             <tr className="numeric" id="grandTotal">
-              <td colSpan="6">Grand total</td>
+              <td colSpan="7">Grand total</td>
               <td>
                 {numberWithCommas(
                   parseInt(props.state.buyerInfo.subtotal) -
@@ -347,7 +349,7 @@ const TableItems = (props) => {
           </>
         )}
         <tr>
-          <td colSpan={props.formState === "faktur" ? 7 : 4}>
+          <td colSpan={props.formState === "faktur" ? 8 : 5}>
             <div id="note">
               Keterangan:&nbsp;
               {props.state.buyerInfo.note}

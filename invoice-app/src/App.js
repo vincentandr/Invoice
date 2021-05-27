@@ -21,6 +21,7 @@ const App = () => {
         name: "",
         discount: false,
         qty: 1,
+        unit: "buah",
         price: 0,
       },
     ],
@@ -42,6 +43,7 @@ const App = () => {
       "Nama Barang",
       "Disc.",
       "Qty",
+      "Unit",
       "Harga",
       "Total",
     ],
@@ -111,7 +113,7 @@ const App = () => {
         : <ReceiptToPrint ref={receiptToPrint} state={receiptState}/>}
       </div>
       <Row style={{ marginTop: "1vw" }}>
-        <Col offset="4">
+        <Col offset="2">
           <Radio.Group
             defaultValue="faktur"
             buttonStyle="solid"
@@ -122,7 +124,7 @@ const App = () => {
             <Radio.Button value="kwitansi">Kwitansi</Radio.Button>
           </Radio.Group>
         </Col>
-        <Col offset="2">
+        <Col offset="3">
           <h2>
             {formState === "faktur" && "Info Faktur"}
             {formState === "surat" && "Info Surat Jalan"}
@@ -131,7 +133,7 @@ const App = () => {
         </Col>
       </Row>
       <Row>
-        <Col offset="4" span="16">
+        <Col offset="2" span="20">
           <Card>
             {formState !== "kwitansi" ? (
               <InvoiceForm
