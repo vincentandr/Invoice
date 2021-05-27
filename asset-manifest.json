@@ -1,27 +1,27 @@
 {
   "files": {
     "main.css": "/Invoice/static/css/main.75fe940b.chunk.css",
-    "main.js": "/Invoice/static/js/main.e89a76fe.chunk.js",
-    "main.js.map": "/Invoice/static/js/main.e89a76fe.chunk.js.map",
-    "runtime-main.js": "/Invoice/static/js/runtime-main.1da4bf3a.js",
-    "runtime-main.js.map": "/Invoice/static/js/runtime-main.1da4bf3a.js.map",
+    "main.js": "/Invoice/static/js/main.4a3a4ac2.chunk.js",
+    "main.js.map": "/Invoice/static/js/main.4a3a4ac2.chunk.js.map",
+    "runtime-main.js": "/Invoice/static/js/runtime-main.6e42e20c.js",
+    "runtime-main.js.map": "/Invoice/static/js/runtime-main.6e42e20c.js.map",
     "static/css/2.1498796d.chunk.css": "/Invoice/static/css/2.1498796d.chunk.css",
-    "static/js/2.77ca299a.chunk.js": "/Invoice/static/js/2.77ca299a.chunk.js",
-    "static/js/2.77ca299a.chunk.js.map": "/Invoice/static/js/2.77ca299a.chunk.js.map",
-    "static/js/3.63c1b851.chunk.js": "/Invoice/static/js/3.63c1b851.chunk.js",
-    "static/js/3.63c1b851.chunk.js.map": "/Invoice/static/js/3.63c1b851.chunk.js.map",
+    "static/js/2.94826915.chunk.js": "/Invoice/static/js/2.94826915.chunk.js",
+    "static/js/2.94826915.chunk.js.map": "/Invoice/static/js/2.94826915.chunk.js.map",
+    "static/js/3.cb60ce78.chunk.js": "/Invoice/static/js/3.cb60ce78.chunk.js",
+    "static/js/3.cb60ce78.chunk.js.map": "/Invoice/static/js/3.cb60ce78.chunk.js.map",
     "index.html": "/Invoice/index.html",
     "static/css/2.1498796d.chunk.css.map": "/Invoice/static/css/2.1498796d.chunk.css.map",
     "static/css/main.75fe940b.chunk.css.map": "/Invoice/static/css/main.75fe940b.chunk.css.map",
-    "static/js/2.77ca299a.chunk.js.LICENSE.txt": "/Invoice/static/js/2.77ca299a.chunk.js.LICENSE.txt",
+    "static/js/2.94826915.chunk.js.LICENSE.txt": "/Invoice/static/js/2.94826915.chunk.js.LICENSE.txt",
     "static/media/logo_with_text.def95dbe.png": "/Invoice/static/media/logo_with_text.def95dbe.png",
     "static/media/logo_with_text_rotated.0b99caeb.png": "/Invoice/static/media/logo_with_text_rotated.0b99caeb.png"
   },
   "entrypoints": [
-    "static/js/runtime-main.1da4bf3a.js",
+    "static/js/runtime-main.6e42e20c.js",
     "static/css/2.1498796d.chunk.css",
-    "static/js/2.77ca299a.chunk.js",
+    "static/js/2.94826915.chunk.js",
     "static/css/main.75fe940b.chunk.css",
-    "static/js/main.e89a76fe.chunk.js"
+    "static/js/main.4a3a4ac2.chunk.js"
   ]
 }
