@@ -19,11 +19,17 @@ const { Option } = Select;
 const InvoiceForm = (props) => {
   const [form] = Form.useForm();
 
+  const handleFinish = () => {
+    console.log(form.getFieldsValue());
+
+    props.submitHandler();
+  };
+
   return (
     <Form
       form={form}
       layout="vertical"
-      onFinish={props.submitHandler}
+      onFinish={handleFinish}
       scrollToFirstError
     >
       <Row>
@@ -533,6 +539,7 @@ const ItemsTable = (props) => {
       name: "",
       discount: false,
       qty: 1,
+      unit: "buah",
       price: 0,
     };
 
