@@ -655,7 +655,7 @@ const ItemsTable = (props) => {
                                 type: "UPDATE_FORM_INPUT_VALUE",
                                 payload: {
                                   name: "discount",
-                                  value: parseInt(value),
+                                  value: parseFloat(value),
                                 },
                               });
                             }}

@@ -331,9 +331,7 @@ const TableItems = (props) => {
             </tr>
             <tr className="numeric" id="discount">
               <td colSpan="7">
-                {`Discount (${numberWithCommas(
-                  props.state.buyerInfo.discount
-                )}%)`}
+                {`Discount (${props.state.buyerInfo.discount}%)`}
               </td>
               <td>{numberWithCommas(props.state.buyerInfo.totalDiscount)}</td>
             </tr>
