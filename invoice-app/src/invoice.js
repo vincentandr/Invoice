@@ -25,7 +25,7 @@ const invoiceStyle = `
     }
 
     .invoice{
-      font-size: 0.7em;
+      font-size: 0.8em;
     }
     
     #pageNo{
@@ -53,7 +53,7 @@ const invoiceStyle = `
     }
      table{
         width: 100%;
-        height:21.5em;
+        height:17.5em;
         font-size: 1.2em;
         border-top: solid 1px black;
       }
@@ -91,7 +91,7 @@ const invoiceStyle = `
       }
 
       h3 {
-        line-height:1em;
+        line-height:0.8em;
       }
       footer {
         display: flex;
@@ -115,10 +115,10 @@ const invoiceStyle = `
 
 class InvoiceToPrint extends React.PureComponent {
   render() {
-    let sizePerPage = 10; // 10 items per print page
+    let sizePerPage = 8; // 8 items per print page
 
     if(this.props.formState === "surat"){ // surat jalan tidak ada subtotal / grand total / discount, jadi baris barang bisa muat lbh banyak
-      sizePerPage = 14;
+      sizePerPage = 10;
     }
 
     let dataLength = this.props.state.data.length; // items count
