@@ -6,7 +6,7 @@ import {
   Row,
   Col,
   Popconfirm,
-  Checkbox,
+  // Checkbox,
   Table,
   Select,
 } from "antd";
@@ -20,7 +20,8 @@ const InvoiceForm = (props) => {
   const [form] = Form.useForm();
 
   const handleFinish = () => {
-    console.log(form.getFieldsValue());
+    // save invoice number to local storage
+    localStorage.setItem(props.formState, props.state.buyerInfo.number);
 
     props.submitHandler();
   };

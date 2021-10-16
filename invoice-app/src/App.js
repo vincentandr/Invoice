@@ -1,11 +1,11 @@
 import "./App.css";
 import { Row, Col, Card, Radio } from "antd";
 import { useReactToPrint } from "react-to-print";
-import React, { useState, useRef, useReducer } from "react";
+import React, { useState, useRef, useReducer, useEffect } from "react";
 import moment from "moment";
 import InvoiceForm from "./invoiceForm.js";
 import { InvoiceToPrint, invoiceStyle } from "./invoice.js";
-import { ReceiptToPrint, receiptStyle} from "./receipt.js";
+import { ReceiptToPrint, receiptStyle } from "./receipt.js";
 import { invoiceReducer, receiptReducer } from "./reducer.js";
 import { Receipt } from "./receiptForm.js";
 
@@ -28,7 +28,9 @@ const App = () => {
     ],
     buyerInfo: {
       name: "",
-      number: "",
+      number: localStorage.getItem("faktur")
+        ? localStorage.getItem("faktur")
+        : "",
       address: "",
       date: moment(new Date()).format("DD-MM-YYYY"),
       due: moment(new Date()).add(30, "days").format("DD-MM-YYYY"),
@@ -57,7 +59,9 @@ const App = () => {
   const defaultReceiptState = {
     data: {
       name: "",
-      receiptNumber: "",
+      receiptNumber: localStorage.getItem("kwitansi")
+        ? localStorage.getItem("kwitansi")
+        : "",
       date: moment(new Date()).format("DD-MM-YYYY"),
       giroNumber: "",
       amount: "",
@@ -93,8 +97,7 @@ const App = () => {
           content: () => invoiceToPrint.current,
           pageStyle: invoiceStyle,
         }
-      :
-      {
+      : {
           content: () => receiptToPrint.current,
           pageStyle: receiptStyle,
         }
@@ -103,15 +106,15 @@ const App = () => {
   return (
     <>
       <div style={{ overflow: "hidden", height: 0 }}>
-        {formState !== "kwitansi" 
-        ? (
+        {formState !== "kwitansi" ? (
           <InvoiceToPrint
             ref={invoiceToPrint}
             state={invoiceState}
             formState={formState}
           />
-        ) 
-        : <ReceiptToPrint ref={receiptToPrint} state={receiptState}/>}
+        ) : (
+          <ReceiptToPrint ref={receiptToPrint} state={receiptState} />
+        )}
       </div>
       <Row style={{ marginTop: "1vw" }}>
         <Col offset="2">
@@ -144,10 +147,13 @@ const App = () => {
                 formState={formState}
               />
             ) : (
-              <ReceiptContext.Provider value={{ 
-                receiptState, 
-                receiptDispatch, 
-                handleFinish }}
+              <ReceiptContext.Provider
+                value={{
+                  receiptState,
+                  receiptDispatch,
+                  handleFinish,
+                  formState,
+                }}
               >
                 <Receipt />
               </ReceiptContext.Provider>

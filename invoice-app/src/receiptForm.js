@@ -6,7 +6,16 @@ import { ReceiptContext } from "./App.js";
 import moment from "moment";
 
 const Receipt = () => {
-  const { handleFinish } = useContext(ReceiptContext);
+  const context = useContext(ReceiptContext);
+
+  const handleFinish = () => {
+    localStorage.setItem(
+      context.formState,
+      context.receiptState.data.receiptNumber
+    );
+
+    context.handleFinish();
+  };
 
   return (
     <div id="kwitansi">

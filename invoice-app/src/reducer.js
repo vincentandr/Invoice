@@ -45,7 +45,11 @@ const invoiceReducer = (state, action) => {
         current = current - 1;
       return {
         ...state,
-        buyerInfo: {...state.buyerInfo, subtotal: subtotal, totalDiscount: totalDiscount},
+        buyerInfo: {
+          ...state.buyerInfo,
+          subtotal: subtotal,
+          totalDiscount: totalDiscount,
+        },
         data: newItems,
         pagination: { ...state.pagination, current: current },
       };
@@ -111,10 +115,11 @@ const invoiceReducer = (state, action) => {
       return {
         ...state,
         data: [...dataCopy],
-        buyerInfo: { 
+        buyerInfo: {
           ...state.buyerInfo,
           subtotal: subtotal,
-          totalDiscount: totalDiscount },
+          totalDiscount: totalDiscount,
+        },
       };
     }
     case "CHANGE_PAGE":
