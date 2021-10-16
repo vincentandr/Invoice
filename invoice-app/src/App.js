@@ -19,6 +19,7 @@ const App = () => {
         count: 1,
         code: "",
         name: "",
+        //discount: false,
         discount: 0,
         qty: 1,
         unit: "buah",
