@@ -26,6 +26,10 @@ const invoiceReducer = (state, action) => {
 
       let newItems = dataCopy.filter((item) => item.id !== id);
 
+      let subtotal = calculateSubtotal(newItems);
+
+      let totalDiscount = calculateDiscount(newItems);
+
       // reorder id after removing
       for (var i = id - 1; i < newItems.length; i++) {
         newItems[i].id = newItems[i].id - 1;
@@ -41,6 +45,7 @@ const invoiceReducer = (state, action) => {
         current = current - 1;
       return {
         ...state,
+        buyerInfo: {...state.buyerInfo, subtotal: subtotal, totalDiscount: totalDiscount},
         data: newItems,
         pagination: { ...state.pagination, current: current },
       };
@@ -54,7 +59,8 @@ const invoiceReducer = (state, action) => {
             count: 1,
             code: "",
             name: "",
-            discount: false,
+            //discount: false,
+            discount: 0,
             qty: 1,
             price: 0,
           },
@@ -74,11 +80,11 @@ const invoiceReducer = (state, action) => {
 
       dataCopy[name] = newVal;
 
-      if(name === "discount"){
-        dataCopy["totalDiscount"] = calculateDiscount(state.data, newVal)
+      // if(name === "discount"){
+      //   dataCopy["totalDiscount"] = calculateDiscount(state.data, newVal)
 
-        console.log(dataCopy["totalDiscount"]);
-      }
+      //   console.log(dataCopy["totalDiscount"]);
+      // }
 
       return {
         ...state,
@@ -100,7 +106,7 @@ const invoiceReducer = (state, action) => {
 
       let subtotal = calculateSubtotal(dataCopy);
 
-      let totalDiscount = calculateDiscount(dataCopy, state.buyerInfo.discount);
+      let totalDiscount = calculateDiscount(dataCopy);
 
       return {
         ...state,

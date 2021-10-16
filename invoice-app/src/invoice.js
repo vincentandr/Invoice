@@ -288,12 +288,14 @@ const TableItems = (props) => {
                       ) : column === "qty" && isNaN(item[column]) ? (
                         0
                       ) : column === "discount" ? (
-                        item.discount &&
-                        props.state.buyerInfo.discount !== 0 ? (
-                          `${props.state.buyerInfo.discount}%`
-                        ) : (
-                          "-"
-                        )
+                        // item.discount &&
+                        // props.state.buyerInfo.discount !== 0 ? (
+                        //   `${props.state.buyerInfo.discount}%`
+                        // ) : (
+                        //   "-"
+                        // )
+
+                        `${item[column]}%`
                       ) : (
                         item[column]
                       )}
@@ -331,7 +333,8 @@ const TableItems = (props) => {
             </tr>
             <tr className="numeric" id="discount">
               <td colSpan="7">
-                {`Discount (${props.state.buyerInfo.discount}%)`}
+                {/* {`Discount (${props.state.buyerInfo.discount}%)`} */}
+                Diskon
               </td>
               <td>{numberWithCommas(props.state.buyerInfo.totalDiscount)}</td>
             </tr>

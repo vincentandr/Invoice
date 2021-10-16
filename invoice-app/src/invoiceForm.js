@@ -291,31 +291,58 @@ const EditableCell = ({
       );
     } else if (dataIndex === "discount") {
       childNode = (
+        // <Form.Item
+        //   name={`${dataIndex}${index}`}
+        //   valuePropName="checked"
+        //   initialValue={state.data[index][dataIndex]}
+        //   preserve={false}
+        //   style={{ marginBottom: 0 }}
+        // >
+        //   <Checkbox
+        //     disabled={state.buyerInfo.discount === 0 || isNaN(state.buyerInfo.discount)}
+        //     defaultChecked={state.data[index][dataIndex]}
+        //     style={{transform: "scale(1.5)" }}
+        //     onChange={(e) =>
+        //       dispatch({
+        //         type: "UPDATE_TABLE_INPUT_VALUE",
+        //         payload: {
+        //           val: e.target.checked,
+        //           index: index,
+        //           column: dataIndex,
+        //         },
+        //       })
+        //     }
+        //   />
+        // </Form.Item>
+
         <Form.Item
           name={`${dataIndex}${index}`}
-          valuePropName="checked"
           initialValue={state.data[index][dataIndex]}
           preserve={false}
           style={{ marginBottom: 0 }}
         >
-          <Checkbox
-            disabled={state.buyerInfo.discount === 0 || isNaN(state.buyerInfo.discount)}
-            defaultChecked={state.data[index][dataIndex]}
-            style={{transform: "scale(1.5)" }}
-            onChange={(e) =>
+          <NumberFormat
+            value={state.data[index][dataIndex]}
+            displayType="input"
+            customInput={Input}
+            suffix="%"
+            allowNegative={false}
+            style={{ width: "100%", textAlign: "end" }}
+            onValueChange={(values) => {
+              const { value } = values;
               dispatch({
                 type: "UPDATE_TABLE_INPUT_VALUE",
                 payload: {
-                  val: e.target.checked,
+                  val: parseInt(value),
                   index: index,
                   column: dataIndex,
                 },
-              })
-            }
+              });
+            }}
           />
         </Form.Item>
       );
-    } else if (dataIndex === "unit"){
+    } else if (dataIndex === "unit") {
       childNode = (
         <Form.Item
           name={`${dataIndex}${index}`}
@@ -408,7 +435,8 @@ const ItemsTable = (props) => {
         title: props.state.columns[3],
         dataIndex: "discount",
         editable: true,
-        width: "5%",
+        width: "10%",
+        align: "right",
       },
       {
         title: props.state.columns[4],
@@ -428,6 +456,7 @@ const ItemsTable = (props) => {
         dataIndex: "price",
         editable: true,
         width: "13%",
+        align: "right",
       },
       {
         title: props.state.columns[7],
@@ -537,7 +566,8 @@ const ItemsTable = (props) => {
       count: props.state.data[props.state.data.length - 1].count + 1,
       code: "",
       name: "",
-      discount: false,
+      //discount: false,
+      discount: 0,
       qty: 1,
       unit: "buah",
       price: 0,
@@ -569,7 +599,8 @@ const ItemsTable = (props) => {
     props.form.setFieldsValue({
       code0: "",
       name0: "",
-      discount0: false,
+      // discount0: false,
+      discount0: 0,
       qty0: 1,
       price0: 0,
     });
@@ -627,10 +658,10 @@ const ItemsTable = (props) => {
                       </Col>
                     </Row>
                     <Row align="middle">
-                      <Col offset="15" span="3">
+                      <Col offset="15" span="5">
                         Discount
                       </Col>
-                      <Col span="2">
+                      {/* <Col span="2">
                         <Form.Item
                           name="discount"
                           rules={[
@@ -661,7 +692,7 @@ const ItemsTable = (props) => {
                             }}
                           />
                         </Form.Item>
-                      </Col>
+                      </Col> */}
                       <Col span="3" offset="1" style={{ textAlign: "end" }}>
                         <NumberFormat
                           displayType="text"
