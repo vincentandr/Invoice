@@ -334,7 +334,7 @@ const EditableCell = ({
               dispatch({
                 type: "UPDATE_TABLE_INPUT_VALUE",
                 payload: {
-                  val: parseInt(value),
+                  val: parseFloat(value),
                   index: index,
                   column: dataIndex,
                 },
