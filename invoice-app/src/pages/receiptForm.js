@@ -1,12 +1,21 @@
 import { Button, Form, Input, DatePicker, Row, Col } from "antd";
 import { useContext } from "react";
-import { numberWithCommas } from "./util.js";
+import { numberWithCommas } from "../helpers/helper.js";
 import NumberFormat from "react-number-format";
 import { ReceiptContext } from "./App.js";
 import moment from "moment";
 
 const Receipt = () => {
-  const { handleFinish } = useContext(ReceiptContext);
+  const context = useContext(ReceiptContext);
+
+  const handleFinish = () => {
+    localStorage.setItem(
+      context.formState,
+      context.receiptState.formInfo.receiptNumber
+    );
+
+    context.handleFinish();
+  };
 
   return (
     <div id="kwitansi">
@@ -63,7 +72,7 @@ const PayerName = () => {
           message: "Nama pembayar tidak boleh kosong",
         },
       ]}
-      initialValue={context.receiptState.data.name}
+      initialValue={context.receiptState.formInfo.name}
     >
       <Input
         onBlur={(e) =>
@@ -93,7 +102,7 @@ const ReceiptNumber = () => {
           message: "Nomor kwitansi tidak boleh kosong",
         },
       ]}
-      initialValue={context.receiptState.data.receiptNumber}
+      initialValue={context.receiptState.formInfo.receiptNumber}
     >
       <Input
         onBlur={(e) =>
@@ -123,7 +132,7 @@ const ReceiptDate = () => {
           message: "Tanggal tidak boleh kosong",
         },
       ]}
-      initialValue={moment(context.receiptState.data.date, "DD-MM-YYYY")}
+      initialValue={moment(context.receiptState.formInfo.date, "DD-MM-YYYY")}
     >
       <DatePicker
         format="DD-MM-YYYY"
@@ -154,7 +163,7 @@ const GiroNumber = () => {
           message: "Nomor cek / giro tidak boleh kosong",
         },
       ]}
-      initialValue={context.receiptState.data.giroNumber}
+      initialValue={context.receiptState.formInfo.giroNumber}
     >
       <Input
         onBlur={(e) =>
@@ -184,13 +193,13 @@ const Amount = () => {
           message: "Jumlah uang tidak boleh kosong",
         },
       ]}
-      initialValue={context.receiptState.data.amount}
+      initialValue={context.receiptState.formInfo.amount}
     >
       <NumberFormat
         format={numberWithCommas}
         displayType="input"
         customInput={Input}
-        style={{ width: "100%"  }}
+        style={{ width: "100%" }}
         onValueChange={(values) => {
           const { value } = values;
           context.receiptDispatch({
@@ -219,7 +228,7 @@ const AmountWritten = () => {
           message: "Jumlah uang (terbilang) tidak boleh kosong",
         },
       ]}
-      initialValue={context.receiptState.data.amountWritten}
+      initialValue={context.receiptState.formInfo.amountWritten}
     >
       <Input
         onBlur={(e) =>
@@ -249,7 +258,7 @@ const Matter = () => {
           message: "Kepentingan tidak boleh kosong",
         },
       ]}
-      initialValue={context.receiptState.data.matter}
+      initialValue={context.receiptState.formInfo.matter}
     >
       <Input.TextArea
         maxLength={150}

@@ -1,127 +1,18 @@
 import React from "react";
-import { numberWithCommas } from "./util.js";
+import { numberWithCommas } from "../helpers/helper.js";
 import NumberFormat from "react-number-format";
-import logo from "./assets/logo_with_text.png";
-
-const invoiceStyle = `
- @media print {  
-   html *{
-      font-family: "Trebuchet MS";
-    }
-      @page { 
-      size: 21cm 13.97cm;
-    } 
-    .numeric{
-      text-align:right;
-    }
-    .page-break{
-      page-break-before: always;
-      page-break-after: always;
-      display: block;
-    }
-
-    #title{
-      text-align: center;
-    }
-
-    .invoice{
-      font-size: 0.7em;
-    }
-    
-    #pageNo{
-      padding-left: 10%;
-    }
-    #buyerCompany{
-      width: 66%;
-    }
-    .column{
-      display: inline-block;
-      width: 33%;
-      margin-bottom: 0.5em;
-    }
-    
-    .info {
-      display: table;
-    }
-    .info h3 {
-      display: table-row;
-    }
-    .info span{
-      display: table-cell;
-      padding-right: 2mm;
-      padding-top: 1.5mm;
-    }
-     table{
-        width: 100%;
-        height:21.5em;
-        font-size: 1.2em;
-        border-top: solid 1px black;
-      }
-      table tr{
-        height:1em;
-      }
-      table tr:last-child{
-        height:auto;
-        border-bottom: solid 1px black;
-      }
-      table td, table th{
-        border-left: solid 1px black;
-        border-right: solid 1px black;
-        padding-left: 1mm;
-        padding-right: 1mm;
-        vertical-align:text-top; 
-      }
-      table, table th{
-        border-bottom: solid 1px black;
-      }
-      table, table th{
-        border: solid 1px black;
-      }
-      table #note td, table #subtotal td, table #discount td{
-        border-top: none;
-        border-bottom: none;
-      }
-       table #grandTotal td{
-         border-bottom: solid 1px black;
-         font-weight: bold;
-       }
-      table #note{
-        height: 1.5em;
-        overflow: hidden;
-      }
-
-      h3 {
-        line-height:1em;
-      }
-      footer {
-        display: flex;
-        position:fixed;
-        bottom: 0;
-        left: 25%;
-        text-align:center;
-      }
-      .sign:nth-child(2){
-        margin-left: 5em;
-      }
-      
-      .sign:last-child{
-        margin-left: 5em;
-      }
-      .sign h3{
-        padding-bottom: 3em;
-      }
-  }
-  `;
+import logo from "../assets/logo_with_text.png";
 
 class InvoiceToPrint extends React.PureComponent {
   render() {
-    let sizePerPage = 10; // 10 items per print page
+    let sizePerPage = 8; // 8 items per print page
 
-    if(this.props.formState === "surat"){ // surat jalan tidak ada subtotal / grand total / discount, jadi baris barang bisa muat lbh banyak
-      sizePerPage = 14;
+    if (this.props.formState === "deliveryOrder") {
+      // delivery order tidak ada subtotal / grand total / discount, jadi baris barang bisa muat lbh banyak
+      sizePerPage = 10;
     }
 
-    let dataLength = this.props.state.data.length; // items count
+    let dataLength = this.props.state.tableData.length; // items count
     let pageCount = Math.ceil(dataLength / sizePerPage); // page count
 
     let invoicePages = [];
@@ -137,14 +28,14 @@ class InvoiceToPrint extends React.PureComponent {
       invoicePages.push(
         <div className="invoice page-break" key={`page${i + 1}`}>
           <Header
-            {...this.props.state.buyerInfo}
+            {...this.props.state.formInfo}
             formState={this.props.formState}
             page={i + 1}
             pageCount={pageCount}
           />
-          <BuyerCompany {...this.props.state.buyerInfo} />
+          <BuyerCompany {...this.props.state.formInfo} />
           <Dates
-            {...this.props.state.buyerInfo}
+            {...this.props.state.formInfo}
             formState={this.props.formState}
           />
           <TableItems {...this.props} start={startIndex} end={endIndex} />
@@ -164,8 +55,8 @@ const Header = (props) => {
         <img src={logo} alt="logo" />
       </div>
       <h1 id="title" className="column">
-        {props.formState === "faktur" && "FAKTUR PENJUALAN"}
-        {props.formState === "surat" && "SURAT JALAN"}
+        {props.formState === "invoice" && "FAKTUR PENJUALAN"}
+        {props.formState === "deliveryOrder" && "SURAT JALAN"}
       </h1>
       <h3 id="pageNo" className="column">
         Page {props.page} of {props.pageCount}
@@ -199,17 +90,18 @@ const Dates = (props) => {
       <div className="info">
         <h3>
           <span>
-            No. { props.formState }
-          </span>: {props.number}
+            No. {props.formState === "invoice" ? "faktur" : "surat jalan"}
+          </span>
+          : {props.number}
         </h3>
         <h3>
           <span>Tanggal dokumen</span>: {props.date}
         </h3>
-        { props.formState === "faktur" &&
+        {props.formState === "invoice" && (
           <h3>
             <span>Jatuh tempo (30 hari)</span>: {props.due}
           </h3>
-        }
+        )}
       </div>
     </div>
   );
@@ -218,12 +110,12 @@ const Dates = (props) => {
 const TableItems = (props) => {
   let startIndex = props.start;
   let endIndex = props.end;
-  let subset = props.state.data.slice(startIndex, endIndex);
+  let subset = props.state.tableData.slice(startIndex, endIndex);
 
   return (
     <table id="innerTable">
-      {/* Columns width based on faktur / surat jalan (w/o price & total) */}
-      {props.formState === "faktur" ? (
+      {/* Columns width based on invoice / delivery order (w/o price & total) */}
+      {props.formState === "invoice" ? (
         <colgroup>
           <col span="1" style={{ width: "5%" }} />
           <col span="1" style={{ width: "20%" }} />
@@ -245,7 +137,7 @@ const TableItems = (props) => {
       )}
       <thead>
         <tr>
-          {props.state.columns.map((column, index) => (
+          {props.columns.map((column, index) => (
             <th
               key={index}
               {...((column.toLowerCase() === "harga" ||
@@ -268,8 +160,8 @@ const TableItems = (props) => {
                   column !== "count" &&
                   ((column !== "price" &&
                     column !== "discount" &&
-                    props.formState === "surat") ||
-                    props.formState === "faktur")
+                    props.formState === "deliveryOrder") ||
+                    props.formState === "invoice")
                 )
                   // Column based on keys of data object
                   return (
@@ -288,12 +180,14 @@ const TableItems = (props) => {
                       ) : column === "qty" && isNaN(item[column]) ? (
                         0
                       ) : column === "discount" ? (
-                        item.discount &&
-                        props.state.buyerInfo.discount !== 0 ? (
-                          `${props.state.buyerInfo.discount}%`
-                        ) : (
-                          "-"
-                        )
+                        // item.discount &&
+                        // props.state.formInfo.discount !== 0 ? (
+                        //   `${props.state.formInfo.discount}%`
+                        // ) : (
+                        //   "-"
+                        // )
+
+                        `${item[column]}%`
                       ) : (
                         item[column]
                       )}
@@ -304,7 +198,7 @@ const TableItems = (props) => {
 
               {/* Total column */}
 
-              {props.formState === "faktur" && (
+              {props.formState === "invoice" && (
                 <td className="numeric">
                   <NumberFormat
                     format={numberWithCommas}
@@ -322,37 +216,36 @@ const TableItems = (props) => {
         })}
       </tbody>
       <tfoot>
-        {/* Subtotal, Discount, Grand total, Note only on faktur */}
-        {props.formState === "faktur" && (
+        {/* Subtotal, Discount, Grand total, Note only on invoice */}
+        {props.formState === "invoice" && (
           <>
             <tr className="numeric" id="subtotal">
               <td colSpan="7">Subtotal</td>
-              <td>{numberWithCommas(props.state.buyerInfo.subtotal)}</td>
+              <td>{numberWithCommas(props.state.formInfo.subtotal)}</td>
             </tr>
             <tr className="numeric" id="discount">
               <td colSpan="7">
-                {`Discount (${numberWithCommas(
-                  props.state.buyerInfo.discount
-                )}%)`}
+                {/* {`Discount (${props.state.formInfo.discount}%)`} */}
+                Diskon
               </td>
-              <td>{numberWithCommas(props.state.buyerInfo.totalDiscount)}</td>
+              <td>{numberWithCommas(props.state.formInfo.totalDiscount)}</td>
             </tr>
             <tr className="numeric" id="grandTotal">
               <td colSpan="7">Grand total</td>
               <td>
                 {numberWithCommas(
-                  parseInt(props.state.buyerInfo.subtotal) -
-                    parseInt(props.state.buyerInfo.totalDiscount)
+                  parseInt(props.state.formInfo.subtotal) -
+                    parseInt(props.state.formInfo.totalDiscount)
                 )}
               </td>
             </tr>
           </>
         )}
         <tr>
-          <td colSpan={props.formState === "faktur" ? 8 : 5}>
+          <td colSpan={props.formState === "invoice" ? 8 : 5}>
             <div id="note">
               Keterangan:&nbsp;
-              {props.state.buyerInfo.note}
+              {props.state.formInfo.note}
             </div>
           </td>
         </tr>
@@ -366,7 +259,7 @@ const Footer = (props) => {
     <footer>
       <SignArea person="Penerima" />
       <SignArea
-        person={props.formState === "faktur" ? "Penjual" : "Hormat kami"}
+        person={props.formState === "invoice" ? "Penjual" : "Hormat kami"}
       />
       <SignArea person="Checklist" />
     </footer>
@@ -382,4 +275,4 @@ const SignArea = ({ person }) => {
   );
 };
 
-export { InvoiceToPrint, invoiceStyle };
+export { InvoiceToPrint };
