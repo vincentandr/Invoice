@@ -1,7 +1,7 @@
 import { calculateSubtotal, calculateDiscount } from "../helpers/helper.js";
 import { defaultInvoiceState } from "../constants/constant.js";
 
-const invoiceReducer = (state, action) => {
+export const invoiceReducer = (state, action) => {
   switch (action.type) {
     case "ADD_ITEM": {
       let newItem = action.payload;
@@ -122,21 +122,3 @@ const invoiceReducer = (state, action) => {
       throw new Error("No matching case found");
   }
 };
-
-const receiptReducer = (state, action) => {
-  switch (action.type) {
-    case "UPDATE_FORM_INPUT_VALUE":
-      const newVal = action.payload.value;
-      const name = action.payload.name;
-
-      let dataCopy = { ...state.formInfo };
-
-      dataCopy[name] = newVal;
-
-      return { ...state, formInfo: dataCopy };
-    default:
-      throw new Error("No matching case found");
-  }
-};
-
-export { invoiceReducer, receiptReducer };

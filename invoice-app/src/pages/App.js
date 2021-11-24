@@ -1,6 +1,6 @@
 import "../css/App.css";
-import { invoiceStyle } from "../css/invoicePrintCSS";
-import { receiptStyle } from "../css/receiptPrintCSS";
+import { invoiceStyle } from "../css/invoicePrint.js";
+import { receiptStyle } from "../css/receiptPrint.js";
 import { Row, Col, Card, Radio } from "antd";
 import { useReactToPrint } from "react-to-print";
 import React, { useState, useRef, useReducer } from "react";
@@ -12,7 +12,8 @@ import {
 import InvoiceForm from "./invoiceForm.js";
 import { InvoiceToPrint } from "./invoicePrint.js";
 import { ReceiptToPrint } from "./receiptPrint.js";
-import { invoiceReducer, receiptReducer } from "../reducers/reducer.js";
+import { invoiceReducer } from "../reducers/invoice.js";
+import { receiptReducer } from "../reducers/receipt.js";
 import { Receipt } from "./receiptForm.js";
 
 const ReceiptContext = React.createContext();
