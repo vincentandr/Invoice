@@ -1,11 +1,12 @@
-import { calculateSubtotal, calculateDiscount } from "./util.js";
+import { calculateSubtotal, calculateDiscount } from "../helpers/helper.js";
+import { defaultInvoiceState } from "../constants/constant.js";
 
 const invoiceReducer = (state, action) => {
   switch (action.type) {
     case "ADD_ITEM": {
       let newItem = action.payload;
 
-      let dataLength = [...state.data].length;
+      let dataLength = [...state.tableData].length;
 
       let pageSize = state.pagination.pageSize;
 
@@ -13,14 +14,14 @@ const invoiceReducer = (state, action) => {
 
       return {
         ...state,
-        data: [...state.data, newItem],
+        tableData: [...state.tableData, newItem],
         pagination: { ...state.pagination, current: current },
       };
     }
     case "REMOVE_ITEM": {
       let id = action.payload;
 
-      let dataCopy = [...state.data];
+      let dataCopy = [...state.tableData];
 
       let pageCount = Math.ceil(dataCopy.length / state.pagination.pageSize);
 
@@ -45,31 +46,20 @@ const invoiceReducer = (state, action) => {
         current = current - 1;
       return {
         ...state,
-        buyerInfo: {
-          ...state.buyerInfo,
+        formInfo: {
+          ...state.formInfo,
           subtotal: subtotal,
           totalDiscount: totalDiscount,
         },
-        data: newItems,
+        tableData: newItems,
         pagination: { ...state.pagination, current: current },
       };
     }
     case "REMOVE_ALL": {
       return {
         ...state,
-        data: [
-          {
-            id: 1,
-            count: 1,
-            code: "",
-            name: "",
-            //discount: false,
-            discount: 0,
-            qty: 1,
-            price: 0,
-          },
-        ],
-        buyerInfo: { ...state.buyerInfo, subtotal: 0, totalDiscount: 0 },
+        tableData: defaultInvoiceState.tableData,
+        formInfo: { ...state.formInfo, subtotal: 0, totalDiscount: 0 },
         pagination: {
           ...state.pagination,
           current: 1,
@@ -80,19 +70,19 @@ const invoiceReducer = (state, action) => {
       let newVal = action.payload.value;
       let name = action.payload.name;
 
-      let dataCopy = { ...state.buyerInfo };
+      let dataCopy = { ...state.formInfo };
 
       dataCopy[name] = newVal;
 
       // if(name === "discount"){
-      //   dataCopy["totalDiscount"] = calculateDiscount(state.data, newVal)
+      //   dataCopy["totalDiscount"] = calculateDiscount(state.tableData, newVal)
 
       //   console.log(dataCopy["totalDiscount"]);
       // }
 
       return {
         ...state,
-        buyerInfo: { ...dataCopy },
+        formInfo: { ...dataCopy },
       };
     }
     case "UPDATE_TABLE_INPUT_VALUE": {
@@ -100,7 +90,7 @@ const invoiceReducer = (state, action) => {
       let newVal = action.payload.val;
       let column = action.payload.column;
 
-      let dataCopy = [...state.data];
+      let dataCopy = [...state.tableData];
 
       let item = { ...dataCopy[index] };
 
@@ -114,9 +104,9 @@ const invoiceReducer = (state, action) => {
 
       return {
         ...state,
-        data: [...dataCopy],
-        buyerInfo: {
-          ...state.buyerInfo,
+        tableData: [...dataCopy],
+        formInfo: {
+          ...state.formInfo,
           subtotal: subtotal,
           totalDiscount: totalDiscount,
         },
@@ -127,28 +117,6 @@ const invoiceReducer = (state, action) => {
       return {
         ...state,
         pagination: { ...state.pagination, current: newCurrentPage },
-      };
-    case "CHANGE_FORM":
-      const newOption = action.payload;
-
-      // If changing form to faktur then printed table columns are adjusted
-      var columns =
-        newOption === "faktur"
-          ? [
-              "No.",
-              "Kode Barang",
-              "Nama Barang",
-              "Disc.",
-              "Qty",
-              "Unit",
-              "Harga",
-              "Total",
-            ]
-          : ["No.", "Kode Barang", "Nama Barang", "Qty", "Unit"];
-
-      return {
-        ...state,
-        columns: columns,
       };
     default:
       throw new Error("No matching case found");
@@ -161,18 +129,14 @@ const receiptReducer = (state, action) => {
       const newVal = action.payload.value;
       const name = action.payload.name;
 
-      let dataCopy = { ...state.data };
+      let dataCopy = { ...state.formInfo };
 
       dataCopy[name] = newVal;
 
-      return { ...state, data: dataCopy };
+      return { ...state, formInfo: dataCopy };
     default:
       throw new Error("No matching case found");
   }
 };
 
 export { invoiceReducer, receiptReducer };
-
-                                
-                                
-                                

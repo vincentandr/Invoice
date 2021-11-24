@@ -1,76 +1,24 @@
-import "./App.css";
+import "../css/App.css";
+import { invoiceStyle } from "../css/invoicePrintCSS";
+import { receiptStyle } from "../css/receiptPrintCSS";
 import { Row, Col, Card, Radio } from "antd";
 import { useReactToPrint } from "react-to-print";
-import React, { useState, useRef, useReducer, useEffect } from "react";
-import moment from "moment";
+import React, { useState, useRef, useReducer } from "react";
+import {
+  defaultInvoiceState,
+  defaultReceiptState,
+  defaultColumns,
+} from "../constants/constant";
 import InvoiceForm from "./invoiceForm.js";
-import { InvoiceToPrint, invoiceStyle } from "./invoice.js";
-import { ReceiptToPrint, receiptStyle } from "./receipt.js";
-import { invoiceReducer, receiptReducer } from "./reducer.js";
+import { InvoiceToPrint } from "./invoicePrint.js";
+import { ReceiptToPrint } from "./receiptPrint.js";
+import { invoiceReducer, receiptReducer } from "../reducers/reducer.js";
 import { Receipt } from "./receiptForm.js";
 
 const ReceiptContext = React.createContext();
 
 const App = () => {
-  const defaultInvoiceState = {
-    data: [
-      {
-        id: 1,
-        count: 1,
-        code: "",
-        name: "",
-        //discount: false,
-        discount: 0,
-        qty: 1,
-        unit: "buah",
-        price: 0,
-      },
-    ],
-    buyerInfo: {
-      name: "",
-      number: localStorage.getItem("faktur")
-        ? localStorage.getItem("faktur")
-        : "",
-      address: "",
-      date: moment(new Date()).format("DD-MM-YYYY"),
-      due: moment(new Date()).add(30, "days").format("DD-MM-YYYY"),
-      city: "",
-      note: "",
-      discount: 0,
-      totalDiscount: 0,
-      subtotal: 0,
-    },
-    columns: [
-      "No.",
-      "Kode Barang",
-      "Nama Barang",
-      "Disc.",
-      "Qty",
-      "Unit",
-      "Harga",
-      "Total",
-    ],
-    pagination: {
-      current: 1,
-      pageSize: 5,
-    },
-  };
-
-  const defaultReceiptState = {
-    data: {
-      name: "",
-      receiptNumber: localStorage.getItem("kwitansi")
-        ? localStorage.getItem("kwitansi")
-        : "",
-      date: moment(new Date()).format("DD-MM-YYYY"),
-      giroNumber: "",
-      amount: "",
-      amountWritten: "",
-      matter: "",
-    },
-  };
-
-  const [formState, setFormState] = useState("faktur");
+  const [formState, setFormState] = useState("invoice");
   const [invoiceState, invoiceDispatch] = useReducer(
     invoiceReducer,
     defaultInvoiceState
@@ -87,12 +35,10 @@ const App = () => {
     const newOption = e.target.value;
 
     setFormState(newOption);
-
-    invoiceDispatch({ type: "CHANGE_FORM", payload: newOption });
   };
 
   const handleFinish = useReactToPrint(
-    formState !== "kwitansi"
+    formState !== "receipt"
       ? {
           content: () => invoiceToPrint.current,
           pageStyle: invoiceStyle,
@@ -106,11 +52,16 @@ const App = () => {
   return (
     <>
       <div style={{ overflow: "hidden", height: 0 }}>
-        {formState !== "kwitansi" ? (
+        {formState !== "receipt" ? (
           <InvoiceToPrint
             ref={invoiceToPrint}
             state={invoiceState}
             formState={formState}
+            columns={
+              formState === "invoice"
+                ? defaultColumns.invoiceColumns
+                : defaultColumns.deliveryOrderColumns
+            }
           />
         ) : (
           <ReceiptToPrint ref={receiptToPrint} state={receiptState} />
@@ -119,32 +70,37 @@ const App = () => {
       <Row style={{ marginTop: "1vw" }}>
         <Col offset="2">
           <Radio.Group
-            defaultValue="faktur"
+            defaultValue="invoice"
             buttonStyle="solid"
             onChange={changeForm}
           >
-            <Radio.Button value="faktur">Faktur Penjualan</Radio.Button>
-            <Radio.Button value="surat">Surat Jalan</Radio.Button>
-            <Radio.Button value="kwitansi">Kwitansi</Radio.Button>
+            <Radio.Button value="invoice">Faktur Penjualan</Radio.Button>
+            <Radio.Button value="deliveryOrder">Surat Jalan</Radio.Button>
+            <Radio.Button value="receipt">Kwitansi</Radio.Button>
           </Radio.Group>
         </Col>
         <Col offset="3">
           <h2>
-            {formState === "faktur" && "Info Faktur"}
-            {formState === "surat" && "Info Surat Jalan"}
-            {formState === "kwitansi" && "Info Kwitansi"}
+            {formState === "invoice" && "Info Faktur"}
+            {formState === "deliveryOrder" && "Info Surat Jalan"}
+            {formState === "receipt" && "Info Kwitansi"}
           </h2>
         </Col>
       </Row>
       <Row>
         <Col offset="2" span="20">
           <Card>
-            {formState !== "kwitansi" ? (
+            {formState !== "receipt" ? (
               <InvoiceForm
                 submitHandler={handleFinish}
                 state={invoiceState}
                 dispatch={invoiceDispatch}
                 formState={formState}
+                columns={
+                  formState === "invoice"
+                    ? defaultColumns.invoiceColumns
+                    : defaultColumns.deliveryOrderColumns
+                }
               />
             ) : (
               <ReceiptContext.Provider
@@ -165,4 +121,4 @@ const App = () => {
   );
 };
 
-export {App, ReceiptContext};
+export { App, ReceiptContext };

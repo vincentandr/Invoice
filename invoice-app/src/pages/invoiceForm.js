@@ -12,7 +12,8 @@ import {
 } from "antd";
 import NumberFormat from "react-number-format";
 import moment from "moment";
-import { numberWithCommas, getFieldsOnTable } from "./util.js";
+import { defaultTableData } from "../constants/constant.js";
+import { numberWithCommas, getFieldsOnTable } from "../helpers/helper.js";
 
 const { Option } = Select;
 
@@ -21,7 +22,7 @@ const InvoiceForm = (props) => {
 
   const handleFinish = () => {
     // save invoice number to local storage
-    localStorage.setItem(props.formState, props.state.buyerInfo.number);
+    localStorage.setItem(props.formState, props.state.formInfo.number);
 
     props.submitHandler();
   };
@@ -44,7 +45,7 @@ const InvoiceForm = (props) => {
               },
             ]}
             label="Nama Perusahaan"
-            initialValue={props.state.buyerInfo.name}
+            initialValue={props.state.formInfo.name}
           >
             <Input
               onBlur={(e) =>
@@ -69,7 +70,7 @@ const InvoiceForm = (props) => {
                 message: "Kota tidak boleh kosong",
               },
             ]}
-            initialValue={props.state.buyerInfo.city}
+            initialValue={props.state.formInfo.city}
           >
             <Input
               onBlur={(e) =>
@@ -96,7 +97,7 @@ const InvoiceForm = (props) => {
                 message: "Alamat perusahaan tidak boleh kosong",
               },
             ]}
-            initialValue={props.state.buyerInfo.address}
+            initialValue={props.state.formInfo.address}
           >
             <Input
               maxLength={80}
@@ -124,7 +125,7 @@ const InvoiceForm = (props) => {
                 message: "Tanggal tidak boleh kosong",
               },
             ]}
-            initialValue={moment(props.state.buyerInfo.date, "DD-MM-YYYY")}
+            initialValue={moment(props.state.formInfo.date, "DD-MM-YYYY")}
           >
             <DatePicker
               format="DD-MM-YYYY"
@@ -140,7 +141,7 @@ const InvoiceForm = (props) => {
             />
           </Form.Item>
         </Col>
-        {props.formState === "faktur" && (
+        {props.formState === "invoice" && (
           <Col span="7">
             <Form.Item
               name="due"
@@ -151,7 +152,7 @@ const InvoiceForm = (props) => {
                   message: "Jatuh tempo tidak boleh kosong",
                 },
               ]}
-              initialValue={moment(props.state.buyerInfo.due, "DD-MM-YYYY")}
+              initialValue={moment(props.state.formInfo.due, "DD-MM-YYYY")}
             >
               <DatePicker
                 format="DD-MM-YYYY"
@@ -172,7 +173,7 @@ const InvoiceForm = (props) => {
           <Form.Item
             name="number"
             label={
-              props.formState === "faktur"
+              props.formState === "invoice"
                 ? "Nomor Faktur Jual"
                 : "Nomor Surat Jalan"
             }
@@ -182,7 +183,7 @@ const InvoiceForm = (props) => {
                 message: "Nomor faktur jual tidak boleh kosong",
               },
             ]}
-            initialValue={props.state.buyerInfo.number}
+            initialValue={props.state.formInfo.number}
           >
             <Input
               onBlur={(e) =>
@@ -203,7 +204,7 @@ const InvoiceForm = (props) => {
           <Form.Item
             label="Keterangan"
             name="note"
-            initialValue={props.state.buyerInfo.note}
+            initialValue={props.state.formInfo.note}
           >
             <Input.TextArea
               maxLength={120}
@@ -226,6 +227,7 @@ const InvoiceForm = (props) => {
         form={form}
         formState={props.formState}
         isButtonHidden={props.isButtonHidden}
+        columns={props.columns}
       />
     </Form>
   );
@@ -259,7 +261,7 @@ const EditableCell = ({
               message: `${title} tidak boleh kosong`,
             },
           ]}
-          initialValue={state.data[index][dataIndex]}
+          initialValue={state.tableData[index][dataIndex]}
           preserve={false}
           style={{ marginBottom: 0 }}
         >
@@ -272,7 +274,7 @@ const EditableCell = ({
               : {
                   allowNegative: false,
                 })}
-            value={state.data[index][dataIndex]}
+            value={state.tableData[index][dataIndex]}
             displayType="input"
             customInput={Input}
             style={{ width: "100%", textAlign: "end" }}
@@ -295,13 +297,13 @@ const EditableCell = ({
         // <Form.Item
         //   name={`${dataIndex}${index}`}
         //   valuePropName="checked"
-        //   initialValue={state.data[index][dataIndex]}
+        //   initialValue={state.tableData[index][dataIndex]}
         //   preserve={false}
         //   style={{ marginBottom: 0 }}
         // >
         //   <Checkbox
-        //     disabled={state.buyerInfo.discount === 0 || isNaN(state.buyerInfo.discount)}
-        //     defaultChecked={state.data[index][dataIndex]}
+        //     disabled={state.formInfo.discount === 0 || isNaN(state.formInfo.discount)}
+        //     defaultChecked={state.tableData[index][dataIndex]}
         //     style={{transform: "scale(1.5)" }}
         //     onChange={(e) =>
         //       dispatch({
@@ -318,12 +320,12 @@ const EditableCell = ({
 
         <Form.Item
           name={`${dataIndex}${index}`}
-          initialValue={state.data[index][dataIndex]}
+          initialValue={state.tableData[index][dataIndex]}
           preserve={false}
           style={{ marginBottom: 0 }}
         >
           <NumberFormat
-            value={state.data[index][dataIndex]}
+            value={state.tableData[index][dataIndex]}
             displayType="input"
             customInput={Input}
             suffix="%"
@@ -347,12 +349,11 @@ const EditableCell = ({
       childNode = (
         <Form.Item
           name={`${dataIndex}${index}`}
-          initialValue={state.data[index][dataIndex]}
+          initialValue={state.tableData[index][dataIndex]}
           preserve={false}
           style={{ marginBottom: 0 }}
         >
           <Select
-            defaultValue="buah"
             onChange={(value) =>
               dispatch({
                 type: "UPDATE_TABLE_INPUT_VALUE",
@@ -379,7 +380,7 @@ const EditableCell = ({
               message: `${title} tidak boleh kosong`,
             },
           ]}
-          initialValue={state.data[index][dataIndex]}
+          initialValue={state.tableData[index][dataIndex]}
           preserve={false}
           style={{ marginBottom: 0 }}
         >
@@ -413,54 +414,54 @@ const ItemsTable = (props) => {
 
   var columns = [];
 
-  if (props.formState === "faktur") {
+  if (props.formState === "invoice") {
     columns = [
       {
-        title: props.state.columns[0],
+        title: props.columns[0],
         dataIndex: "id",
         width: "5%",
       },
       {
-        title: props.state.columns[1],
+        title: props.columns[1],
         dataIndex: "code",
         editable: true,
         width: "15%",
       },
       {
-        title: props.state.columns[2],
+        title: props.columns[2],
         dataIndex: "name",
         editable: true,
         width: "20%",
       },
       {
-        title: props.state.columns[3],
+        title: props.columns[3],
         dataIndex: "discount",
         editable: true,
         width: "10%",
         align: "right",
       },
       {
-        title: props.state.columns[4],
+        title: props.columns[4],
         dataIndex: "qty",
         editable: true,
         width: "8%",
         align: "right",
       },
       {
-        title: props.state.columns[5],
+        title: props.columns[5],
         dataIndex: "unit",
         editable: true,
         width: "10%",
       },
       {
-        title: props.state.columns[6],
+        title: props.columns[6],
         dataIndex: "price",
         editable: true,
         width: "13%",
         align: "right",
       },
       {
-        title: props.state.columns[7],
+        title: props.columns[7],
         dataIndex: "total",
         align: "right",
         width: "14%",
@@ -474,10 +475,11 @@ const ItemsTable = (props) => {
               format={numberWithCommas}
               displayType="text"
               value={
-                isNaN(props.state.data[idx].qty) ||
-                isNaN(props.state.data[idx].price)
+                isNaN(props.state.tableData[idx].qty) ||
+                isNaN(props.state.tableData[idx].price)
                   ? 0
-                  : props.state.data[idx].qty * props.state.data[idx].price
+                  : props.state.tableData[idx].qty *
+                    props.state.tableData[idx].price
               }
             />
           );
@@ -487,41 +489,41 @@ const ItemsTable = (props) => {
         title: "Hapus",
         dataIndex: "remove",
         render: (_, record) =>
-          props.state.data.length > 1 ? (
+          props.state.tableData.length > 1 ? (
             <Button type="default" danger onClick={() => removeItem(record.id)}>
               Hapus
             </Button>
           ) : null,
       },
     ];
-  } else if (props.formState === "surat") {
+  } else if (props.formState === "deliveryOrder") {
     columns = [
       {
-        title: props.state.columns[0],
+        title: props.columns[0],
         dataIndex: "id",
         width: "5%",
       },
       {
-        title: props.state.columns[1],
+        title: props.columns[1],
         dataIndex: "code",
         editable: true,
         width: "15%",
       },
       {
-        title: props.state.columns[2],
+        title: props.columns[2],
         dataIndex: "name",
         editable: true,
         width: "50%",
       },
       {
-        title: props.state.columns[3],
+        title: props.columns[3],
         dataIndex: "qty",
         editable: true,
         width: "10%",
         align: "right",
       },
       {
-        title: props.state.columns[4],
+        title: props.columns[4],
         dataIndex: "unit",
         editable: true,
         width: "10%",
@@ -530,7 +532,7 @@ const ItemsTable = (props) => {
         title: "Hapus",
         dataIndex: "remove",
         render: (_, record) =>
-          props.state.data.length > 1 ? (
+          props.state.tableData.length > 1 ? (
             <Button type="default" danger onClick={() => removeItem(record.id)}>
               Hapus
             </Button>
@@ -562,20 +564,15 @@ const ItemsTable = (props) => {
   const addItem = () => {
     const toBeReset = getFieldsOnTable(props.form.getFieldsValue());
 
-    const newRow = {
-      id: props.state.data.length + 1,
-      count: props.state.data[props.state.data.length - 1].count + 1,
-      code: "",
-      name: "",
-      //discount: false,
-      discount: 0,
-      qty: 1,
-      unit: "buah",
-      price: 0,
-    };
+    // copy defaulttabledata by values not reference
+    let newRow = Object.assign({}, defaultTableData);
+
+    newRow.id = props.state.tableData.length + 1;
+    newRow.count =
+      props.state.tableData[props.state.tableData.length - 1].count + 1;
 
     // validate before adding new item creates a new page
-    if (props.state.data.length % props.state.pagination.pageSize === 0) {
+    if (props.state.tableData.length % props.state.pagination.pageSize === 0) {
       props.form
         .validateFields(toBeReset)
         .then((values) => {
@@ -603,6 +600,7 @@ const ItemsTable = (props) => {
       // discount0: false,
       discount0: 0,
       qty0: 1,
+      unit0: "buah",
       price0: 0,
     });
   };
@@ -622,8 +620,9 @@ const ItemsTable = (props) => {
 
   const isButtonHidden = () => {
     return (
-      Math.ceil(props.state.data.length / props.state.pagination.pageSize) !==
-        props.state.pagination.current && props.formState !== "kwitansi"
+      Math.ceil(
+        props.state.tableData.length / props.state.pagination.pageSize
+      ) !== props.state.pagination.current && props.formState !== "receipt"
     );
   };
 
@@ -633,12 +632,12 @@ const ItemsTable = (props) => {
         <Col span="22" offset="1">
           <Table
             components={components}
-            dataSource={props.state.data}
+            dataSource={props.state.tableData}
             columns={tableColumns}
             pagination={props.state.pagination}
             onChange={(pagination) => changePage(pagination)}
             rowKey="count"
-            {...(props.formState === "faktur" && {
+            {...(props.formState === "invoice" && {
               footer: () => {
                 return (
                   <div style={{ fontWeight: "bold" }}>
@@ -651,9 +650,9 @@ const ItemsTable = (props) => {
                           displayType="text"
                           format={numberWithCommas}
                           value={
-                            isNaN(props.state.buyerInfo.subtotal)
+                            isNaN(props.state.formInfo.subtotal)
                               ? 0
-                              : props.state.buyerInfo.subtotal
+                              : props.state.formInfo.subtotal
                           }
                         />
                       </Col>
@@ -671,7 +670,7 @@ const ItemsTable = (props) => {
                               message: "Discount tidak boleh kosong",
                             },
                           ]}
-                          initialValue={props.state.buyerInfo.discount}
+                          initialValue={props.state.formInfo.discount}
                           style={{ marginBottom: 0, fontWeight: "normal" }}
                         >
                           <NumberFormat
@@ -679,7 +678,7 @@ const ItemsTable = (props) => {
                             customInput={Input}
                             displayType="input"
                             allowNegative={false}
-                            value={props.state.buyerInfo.discount}
+                            value={props.state.formInfo.discount}
                             style={{ textAlign: "end" }}
                             onValueChange={(values) => {
                               const { value } = values;
@@ -699,9 +698,9 @@ const ItemsTable = (props) => {
                           displayType="text"
                           format={numberWithCommas}
                           value={
-                            isNaN(props.state.buyerInfo.totalDiscount)
+                            isNaN(props.state.formInfo.totalDiscount)
                               ? 0
-                              : props.state.buyerInfo.totalDiscount
+                              : props.state.formInfo.totalDiscount
                           }
                         />
                       </Col>
@@ -715,11 +714,11 @@ const ItemsTable = (props) => {
                           displayType="text"
                           format={numberWithCommas}
                           value={
-                            isNaN(props.state.buyerInfo.totalDiscount) ||
-                            isNaN(props.state.buyerInfo.subtotal)
+                            isNaN(props.state.formInfo.totalDiscount) ||
+                            isNaN(props.state.formInfo.subtotal)
                               ? 0
-                              : props.state.buyerInfo.subtotal -
-                                props.state.buyerInfo.totalDiscount
+                              : props.state.formInfo.subtotal -
+                                props.state.formInfo.totalDiscount
                           }
                         />
                       </Col>
