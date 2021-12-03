@@ -15,6 +15,7 @@ import { ReceiptToPrint } from "./receiptPrint.js";
 import { invoiceReducer } from "../reducers/invoice.js";
 import { receiptReducer } from "../reducers/receipt.js";
 import { Receipt } from "./receiptForm.js";
+import axios from "axios";
 
 const ReceiptContext = React.createContext();
 
@@ -38,17 +39,48 @@ const App = () => {
     setFormState(newOption);
   };
 
-  const handleFinish = useReactToPrint(
-    formState !== "receipt"
+  const printForm = useReactToPrint(
+    formState === "receipt"
       ? {
-          content: () => invoiceToPrint.current,
-          pageStyle: invoiceStyle,
-        }
-      : {
           content: () => receiptToPrint.current,
           pageStyle: receiptStyle,
         }
+      : {
+          content: () => invoiceToPrint.current,
+          pageStyle: invoiceStyle,
+        }
   );
+
+  const handleFinish = () => {
+    let data = null;
+    let uri = "";
+
+    if (formState !== "receipt") {
+      data = invoiceState;
+      if (formState === "invoice") {
+        uri = "/invoiceInsert";
+      } else {
+        uri = "/DOInsert";
+      }
+    } else {
+      data = receiptState;
+      uri = "/receiptInsert";
+    }
+
+    data = JSON.stringify(data);
+
+    axios
+      .post(uri, data, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then(function (response) {
+        console.log("success1");
+      });
+
+    printForm();
+  };
 
   return (
     <>
