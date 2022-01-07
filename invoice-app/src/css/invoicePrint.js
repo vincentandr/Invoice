@@ -5,12 +5,12 @@ export const invoiceStyle = `
     }
       @page { 
       size: 21cm 13.97cm;
+
     } 
     .numeric{
       text-align:right;
     }
     .page-break{
-      page-break-before: always;
       page-break-after: always;
       display: block;
     }
@@ -21,6 +21,8 @@ export const invoiceStyle = `
 
     .invoice{
       font-size: 0.8em;
+      height: 100%;
+      width: 100%;
     }
     
     #pageNo{
@@ -48,41 +50,43 @@ export const invoiceStyle = `
     }
      table{
         width: 100%;
-        height:17.5em;
+        height:18.5em;
         font-size: 1.2em;
-        border-top: solid 1px black;
+        border-top: solid 2pt black;
       }
       table tr{
         height:1em;
       }
-      table tr:last-child{
-        height:auto;
-        border-bottom: solid 1px black;
+      table tbody tr:last-child{
+        height:auto !important;
       }
       table td, table th{
-        border-left: solid 1px black;
-        border-right: solid 1px black;
-        padding-left: 1mm;
-        padding-right: 1mm;
+        border-left: solid 2pt black;
+        border-right: solid 2pt black;
+        padding-left: 2pt;
+        padding-right: 2pt;
         vertical-align:text-top; 
       }
-      table, table th{
-        border-bottom: solid 1px black;
+      table th{
+        border-bottom: solid 2pt black;
       }
-      table, table th{
-        border: solid 1px black;
-      }
-      table #note td, table #subtotal td, table #discount td{
+      table #subtotal td {
+        border-top: solid 2pt black;
+        border-bottom: none;
+      } 
+      table #discount td{
         border-top: none;
         border-bottom: none;
       }
        table #grandTotal td{
-         border-bottom: solid 1px black;
+         border-bottom: solid 2pt black;
          font-weight: bold;
        }
       table #note{
         height: 1.5em;
         overflow: hidden;
+        border-top: none;
+        border-bottom: solid 2pt black;
       }
 
       h3 {
@@ -91,8 +95,10 @@ export const invoiceStyle = `
       footer {
         display: flex;
         position:fixed;
+        justify-content:center;
+        width: 100%;
         bottom: 0;
-        left: 25%;
+        margin-top: 0.5em;
         text-align:center;
       }
       .sign:nth-child(2){
@@ -103,7 +109,7 @@ export const invoiceStyle = `
         margin-left: 5em;
       }
       .sign h3{
-        padding-bottom: 3em;
+        padding-bottom: 1.5em;
       }
   }
   `;

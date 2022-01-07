@@ -47,7 +47,6 @@ class ReceiptToPrint extends React.PureComponent {
       <Layout
         style={{
           backgroundColor: "transparent",
-          height: "99%",
           fontSize: "1.2em",
         }}
       >
@@ -55,24 +54,26 @@ class ReceiptToPrint extends React.PureComponent {
           width="15%"
           style={{
             backgroundColor: "transparent",
-            border: "solid 4px black",
+            border: "solid 2mm black",
             borderStyle: "double",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          <div id="logo">
-            <img src={logo_rotated} alt="logo" />
-          </div>
+          <img src={logo_rotated} alt="logo" />
         </Sider>
         <Layout
           style={{
             backgroundColor: "transparent",
-            border: "solid 1px black",
           }}
         >
           <Header
             style={{
               backgroundColor: "transparent",
-              border: "solid 1px black",
+              borderRight: "solid 0.5mm black",
+              borderTop: "solid 0.5mm black",
+              borderBottom: "solid 0.5mm black",
             }}
           >
             <h1>Kwitansi</h1>
@@ -81,12 +82,17 @@ class ReceiptToPrint extends React.PureComponent {
           <Content
             style={{
               backgroundColor: "transparent",
-              border: "solid 1px black",
+              borderRight: "solid 0.5mm black",
+              borderBottom: "solid 0.5mm black",
               height: "40%",
             }}
           >
-            <Space direction="vertical" size="small" style={{ width: "100%" }}>
-              <Row style={{ marginTop: "1em" }}>
+            <Space
+              direction="vertical"
+              size="small"
+              style={{ width: "100%", marginTop: "1em", marginBottom: "1em" }}
+            >
+              <Row>
                 <Col span="5" offset="1">
                   No. kwitansi
                 </Col>
@@ -134,29 +140,20 @@ class ReceiptToPrint extends React.PureComponent {
                   &nbsp;
                 </Col>
               </Row>
-              <Space
-                direction="vertical"
-                size="large"
-                style={{ width: "100%" }}
-              >
-                <Row>
-                  <Col className="field" offset="7" span="15">
-                    &nbsp;
-                  </Col>
-                </Row>
-                <Row>
-                  <Col
-                    className="field"
-                    offset="16"
-                    span="5"
-                    style={{ textAlign: "center" }}
-                  >
-                    {this.props.state.formInfo.date}
-                  </Col>
-                </Row>
-              </Space>
               <Row>
-                <Col>&nbsp;</Col>
+                <Col className="field" offset="7" span="15">
+                  &nbsp;
+                </Col>
+              </Row>
+              <Row>
+                <Col
+                  className="field"
+                  offset="16"
+                  span="5"
+                  style={{ textAlign: "center" }}
+                >
+                  {this.props.state.formInfo.date}
+                </Col>
               </Row>
               <Row className="footer">
                 <Col offset="1" span="4">
