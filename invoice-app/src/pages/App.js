@@ -69,15 +69,15 @@ const App = () => {
 
     data = JSON.stringify(data);
 
-    axios
-      .post(uri, data, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-      .then(function (response) {
-        console.log("success1");
-      });
+    // axios
+    //   .post(uri, data, {
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //   })
+    //   .then(function (response) {
+    //     console.log("success1");
+    //   });
 
     printForm();
   };
