@@ -242,11 +242,9 @@ const TableItems = (props) => {
           </>
         )}
         <tr>
-          <td colSpan={props.formState === "invoice" ? 8 : 5}>
-            <div id="note">
-              Keterangan:&nbsp;
-              {props.state.formInfo.note}
-            </div>
+          <td colSpan={props.formState === "invoice" ? 9 : 5} id="note">
+            Keterangan:&nbsp;
+            {props.state.formInfo.note}
           </td>
         </tr>
       </tfoot>

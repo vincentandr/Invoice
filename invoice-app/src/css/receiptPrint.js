@@ -14,15 +14,11 @@ export const receiptStyle = `
       }
 
       #logo{
-        position: absolute;
-        bottom: 7%;
-        text-align: center; 
-        left: 0;
-        right: 0;
+        
       }
 
       .field {
-        border-bottom: solid 2px black;
+        border-bottom: solid 0.5mm black;
       }
 
       #textarea{
