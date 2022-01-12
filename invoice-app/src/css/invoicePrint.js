@@ -79,13 +79,12 @@ export const invoiceStyle = `
         border-bottom: none;
       }
        table #grandTotal td{
-         border-bottom: solid 2pt black;
          font-weight: bold;
        }
       table #note{
         height: 1.5em;
         overflow: hidden;
-        border-top: none;
+        border-top: solid 2pt black;
         border-bottom: solid 2pt black;
       }
 
@@ -98,7 +97,6 @@ export const invoiceStyle = `
         justify-content:center;
         width: 100%;
         bottom: 0;
-        margin-top: 0.5em;
         text-align:center;
       }
       .sign:nth-child(2){
@@ -109,7 +107,7 @@ export const invoiceStyle = `
         margin-left: 5em;
       }
       .sign h3{
-        padding-bottom: 1.5em;
+        padding-bottom: 7mm;
       }
   }
   `;
